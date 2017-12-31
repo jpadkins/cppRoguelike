@@ -1,0 +1,9 @@
+assets/*
+!assets/.gitkeep
+
+cmake-build-debug/*
+.idea/*
+
+*.swo
+*.swp
+.DS_Store
