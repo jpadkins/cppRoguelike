@@ -8,7 +8,10 @@ set(CMAKE_CXX_FLAGS "-Werror -Wall -Wextra -Wconversion -pedantic -O2 -g")
 
 # Source files
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
+include_directories(${PROJECT_SOURCE_DIR})
+file(GLOB_RECURSE SOURCES
+        ${PROJECT_SOURCE_DIR}/*.cpp
+        ${PROJECT_SOURCE_DIR}/*.hpp)
 
 # SFML 2.x
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
@@ -30,6 +33,4 @@ target_link_libraries(roguelike dl)
 target_link_libraries(roguelike ${SFML_LIBRARIES})
 target_link_libraries(roguelike
         ${Boost_SYSTEM_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_LOG_LIBRARY}
-        )
+        ${Boost_FILESYSTEM_LIBRARY})

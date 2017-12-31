@@ -2,7 +2,7 @@
 /// @file   GlyphTileMap.hpp
 /// @author Jacob P Adkins (jpadkins)
 /// @brief  An SFML-based drawable/transformable class for displaying a grid of
-///         characters with colored backgrounds and several spacing options.
+///         characters with colored backgrounds and several spacing options
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef ROGUELIKE__GLYPH_TILE_MAP_H

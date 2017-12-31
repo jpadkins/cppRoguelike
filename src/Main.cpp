@@ -1,27 +1,36 @@
+///////////////////////////////////////////////////////////////////////////////
+/// @file   Main.cpp
+/// @author Jacob Adkins (jpadkins)
+/// @brief  Entry point of the application
+///////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 
-#include "GlyphTileMap.hpp"
+///////////////////////////////////////////////////////////////////////////////
+/// Headers
+///////////////////////////////////////////////////////////////////////////////
+#include "Game.hpp"
 
-class Game {
-public:
-
-    Game();
-
-private:
-};
-
-Game::Game()
+///////////////////////////////////////////////////////////////////////////////
+/// Main
+///////////////////////////////////////////////////////////////////////////////
+int main()
 {
-    std::cout << "In constructor!" << std::endl;
-}
+    auto windowMode = sf::VideoMode::getFullscreenModes()[0];
+    Game::Settings gameSettings = {
+        {
+            true,
+            sf::Style::Fullscreen,
+            "SFML App",
+            windowMode,
+            60
+        },
+        {
+            {256, 224}
+        }
+    };
 
-int main() {
-
-    Game game;
+    Game game(gameSettings);
+    game.play();
 
     return 0;
 }

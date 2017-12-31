@@ -2,7 +2,7 @@
 /// @file   GlyphTileMap.cpp
 /// @author Jacob P Adkins (jpadkins)
 /// @brief  An SFML-based drawable/transformable class for displaying a grid of
-///         characters with colored backgrounds and several spacing options.
+///         characters with colored backgrounds and several spacing options
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "GlyphTileMap.hpp"
@@ -10,10 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::Tile::Tile()
     : type(Type::Center)
-    , offset(0, 0)
-    , foreground(sf::Color::White)
-    , background(sf::Color::Black)
-    , character('?')
+      , offset(0, 0)
+      , foreground(sf::Color::White)
+      , background(sf::Color::Black)
+      , character('?')
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,10 +23,10 @@ GlyphTileMap::Tile::Tile(sf::Uint32 character,
                          const sf::Color& background,
                          const sf::Vector2i& offset)
     : type(type)
-    , offset(offset)
-    , foreground(foreground)
-    , background(background)
-    , character(character)
+      , offset(offset)
+      , foreground(foreground)
+      , background(background)
+      , character(character)
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,11 +43,11 @@ GlyphTileMap::GlyphTileMap(sf::Font& font,
                            const sf::Vector2i& spacing,
                            sf::Uint32 characterSize)
     : m_font(font)
-    , m_area(area)
-    , m_charSize(characterSize)
-    , m_spacing(spacing)
-    , m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
-    , m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
+      , m_area(area)
+      , m_charSize(characterSize)
+      , m_spacing(spacing)
+      , m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
+      , m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ sf::Vector2i GlyphTileMap::getCoordFromPosition(const sf::Vector2i& position)
 
 ///////////////////////////////////////////////////////////////////////////////
 void GlyphTileMap::draw(sf::RenderTarget& target, sf::RenderStates states)
-    const
+const
 {
     states.transform *= getTransform();
     states.texture = &m_font.getTexture(m_charSize);
@@ -142,26 +142,26 @@ sf::Vector2i GlyphTileMap::getOffset(const sf::Glyph& glyph,
     sf::Vector2i adjustedOffset = {0, 0};
 
     switch (type) {
-    case Tile::Text:
-        {
-        adjustedOffset.x = static_cast<int>(glyph.bounds.left);
-        adjustedOffset.y = static_cast<int>(m_spacing.y + glyph.bounds.top);
+        case Tile::Text: {
+            adjustedOffset.x = static_cast<int>(glyph.bounds.left);
+            adjustedOffset.y = static_cast<int>(m_spacing.y +
+                                                glyph.bounds.top);
         }
-        break;
-    case Tile::Exact:
-        adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-        adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
-        adjustedOffset.x += offset.x;
-        adjustedOffset.y += offset.y;
-        break;
-    case Tile::Floor:
-        adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-        adjustedOffset.y = (m_spacing.y - glyph.textureRect.height);
-        break;
-    case Tile::Center:
-        adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-        adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
-        break;
+            break;
+        case Tile::Exact:
+            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
+            adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
+            adjustedOffset.x += offset.x;
+            adjustedOffset.y += offset.y;
+            break;
+        case Tile::Floor:
+            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
+            adjustedOffset.y = m_spacing.y - glyph.textureRect.height;
+            break;
+        case Tile::Center:
+            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
+            adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
+            break;
     }
 
     return adjustedOffset;
@@ -208,39 +208,39 @@ void GlyphTileMap::updateFgPosition(const sf::Vector2i& coord,
     m_foreground[index].position = {
         static_cast<float>((coord.x * m_spacing.x) + offset.x),
         static_cast<float>((coord.y * m_spacing.y) + offset.y)
-        };
+    };
     m_foreground[index + 1].position = {
         static_cast<float>((coord.x * m_spacing.x) + texRect.width
-            + offset.x),
+                           + offset.x),
         static_cast<float>((coord.y * m_spacing.y) + offset.y)
-        };
+    };
     m_foreground[index + 2].position = {
         static_cast<float>((coord.x * m_spacing.x) + texRect.width
-            + offset.x),
+                           + offset.x),
         static_cast<float>((coord.y * m_spacing.y) + texRect.height
-            + offset.y)
-        };
+                           + offset.y)
+    };
     m_foreground[index + 3].position = {
         static_cast<float>((coord.x * m_spacing.x) + offset.x),
         static_cast<float>((coord.y * m_spacing.y) + texRect.height
-            + offset.y)
-        };
+                           + offset.y)
+    };
     m_foreground[index].texCoords = {
         static_cast<float>(texRect.left),
         static_cast<float>(texRect.top)
-        };
+    };
     m_foreground[index + 1].texCoords = {
         static_cast<float>(texRect.left + texRect.width),
         static_cast<float>(texRect.top)
-        };
+    };
     m_foreground[index + 2].texCoords = {
         static_cast<float>(texRect.left + texRect.width),
         static_cast<float>(texRect.top + texRect.height)
-        };
+    };
     m_foreground[index + 3].texCoords = {
         static_cast<float>(texRect.left),
         static_cast<float>(texRect.top + texRect.height)
-        };
+    };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -263,19 +263,19 @@ void GlyphTileMap::updateBgPosition(const sf::Vector2i& coord)
     m_background[index].position = {
         static_cast<float>(coord.x * m_spacing.x),
         static_cast<float>(coord.y * m_spacing.y)
-        };
+    };
     m_background[index + 1].position = {
         static_cast<float>((coord.x * m_spacing.x) + m_spacing.x),
         static_cast<float>(coord.y * m_spacing.y)
-        };
+    };
     m_background[index + 2].position = {
         static_cast<float>((coord.x * m_spacing.x) + m_spacing.x),
         static_cast<float>((coord.y * m_spacing.y) + m_spacing.y)
-        };
+    };
     m_background[index + 3].position = {
         static_cast<float>(coord.x * m_spacing.x),
         static_cast<float>((coord.y * m_spacing.y) + m_spacing.y)
-        };
+    };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
