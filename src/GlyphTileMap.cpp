@@ -9,12 +9,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::Tile::Tile()
-    : type(Type::Center)
-      , offset(0, 0)
-      , foreground(sf::Color::White)
-      , background(sf::Color::Black)
-      , character('?')
-{}
+    : type(Type::Center),
+      offset(0, 0),
+      foreground(sf::Color::White),
+      background(sf::Color::Black),
+      character('?') {}
 
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::Tile::Tile(sf::Uint32 character,
@@ -22,12 +21,11 @@ GlyphTileMap::Tile::Tile(sf::Uint32 character,
                          const sf::Color& foreground,
                          const sf::Color& background,
                          const sf::Vector2i& offset)
-    : type(type)
-      , offset(offset)
-      , foreground(foreground)
-      , background(background)
-      , character(character)
-{}
+    : type(type),
+      offset(offset),
+      foreground(foreground),
+      background(background),
+      character(character) {}
 
 ///////////////////////////////////////////////////////////////////////////////
 void GlyphTileMap::Tile::update(sf::Uint32 delta)
@@ -42,13 +40,12 @@ GlyphTileMap::GlyphTileMap(sf::Font& font,
                            const sf::Vector2i& area,
                            const sf::Vector2i& spacing,
                            sf::Uint32 characterSize)
-    : m_font(font)
-      , m_area(area)
-      , m_charSize(characterSize)
-      , m_spacing(spacing)
-      , m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
-      , m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
-{}
+    : m_font(font),
+      m_area(area),
+      m_charSize(characterSize),
+      m_spacing(spacing),
+      m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4)),
+      m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4)) {}
 
 ///////////////////////////////////////////////////////////////////////////////
 const sf::Vector2i& GlyphTileMap::getArea() const
@@ -119,8 +116,8 @@ sf::Vector2i GlyphTileMap::getCoordFromPosition(const sf::Vector2i& position)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::draw(sf::RenderTarget& target, sf::RenderStates states)
-const
+void GlyphTileMap::draw(sf::RenderTarget& target,
+                        sf::RenderStates states) const
 {
     states.transform *= getTransform();
     states.texture = &m_font.getTexture(m_charSize);

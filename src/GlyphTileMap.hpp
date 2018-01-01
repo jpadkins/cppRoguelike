@@ -33,7 +33,7 @@ public:
         /// Center: The Tile's character is centered both horizontally and
         ///         vertically
         ///////////////////////////////////////////////////////////////////////
-        enum Type {Text, Exact, Floor, Center};
+        enum Type { Text, Exact, Floor, Center };
 
         ///////////////////////////////////////////////////////////////////////
         /// @brief The Animation function type is used for the update callback
@@ -184,7 +184,7 @@ public:
     /// @return True if the position is contained within the GlyphTileMap,
     ///         otherwise false
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    template<typename T>
     bool containsPosition(const sf::Vector2<T>& position) const
     {
         auto thisPosition = this->getPosition();
@@ -209,8 +209,8 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     /// Overloaded draw function from sf::Drawable/sf::Transformable
     ///////////////////////////////////////////////////////////////////////////
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const
-        override;
+    void draw(sf::RenderTarget& target,
+              sf::RenderStates states) const override;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns the 1-dimensional index of a tile at x and y coord

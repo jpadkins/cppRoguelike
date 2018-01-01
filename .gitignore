@@ -1,6 +1,12 @@
 assets/*
 !assets/.gitkeep
 
+build/*
+!build/.gitkeep
+
+bin/*
+!bin/.gitkeep
+
 cmake-build-debug/*
 .idea/*
 

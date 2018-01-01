@@ -26,6 +26,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 # Define executable
 add_executable(roguelike ${SOURCES})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 # Link libraries
 target_link_libraries(roguelike m)
