@@ -11,9 +11,60 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
+
 #include "State.hpp"
 #include "Common.hpp"
+#include "FrameManager.hpp"
+#include "GlyphTileMap.hpp"
+
+// TODO: Remove this
+class FooFrame : public Frame {
+public:
+
+    FooFrame() = delete;
+    explicit FooFrame(const std::string& tag)
+        : Frame(tag), m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
+    {
+        GlyphTileMap::Tile tile('x',
+                                GlyphTileMap::Tile::Center,
+                                sf::Color::Black,
+                                sf::Color::White);
+
+        for (int x = 0; x < m_glyphMap.getArea().x; ++x) {
+            for (int y = 0; y < m_glyphMap.getArea().y; ++y) {
+                m_glyphMap.setTile({x, y}, tile);
+            }
+        }
+
+        this->setPosition(rand() % 800, rand() % 600);
+    }
+
+    void update() override {}
+
+    bool containsMouse() const override
+    {
+        return m_glyphMap.containsMouse();
+    }
+
+    bool containsCoord(const sf::Vector2i& coord) const override
+    {
+        return m_glyphMap.containsCoord(coord);
+    }
+
+private:
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override
+    {
+        states.transform *= getTransform();
+        target.draw(m_glyphMap, states);
+    }
+
+    GlyphTileMap m_glyphMap;
+
+};
+// TODO: ^
 
 ///////////////////////////////////////////////////////////////////////////////
 Game::Game(Settings& settings) : m_frameSize(settings.frame.size)
@@ -31,7 +82,7 @@ Game::Game(Settings& settings) : m_frameSize(settings.frame.size)
 
     m_window.setVerticalSyncEnabled(settings.window.vsync);
     m_window.setFramerateLimit(settings.window.fpsLimit);
-    m_window.setMouseCursorVisible(false);
+    m_window.setMouseCursorVisible(true);
     m_window.setActive();
 
     updateFrameScale();
@@ -75,6 +126,14 @@ void Game::updateState()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
         m_window.close();
     }
+
+    // TODO: Remove this
+    static int count = 0;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        State::get().frameManager->add(new FooFrame(std::to_string(count)));
+        ++count;
+    }
+    // TODO: ^
 }
 
 ///////////////////////////////////////////////////////////////////////////////

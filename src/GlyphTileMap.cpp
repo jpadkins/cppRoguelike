@@ -5,16 +5,16 @@
 ///         characters with colored backgrounds and several spacing options
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "State.hpp"
 #include "GlyphTileMap.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::Tile::Tile()
-    : type(Type::Center)
-      , offset(0, 0)
-      , foreground(sf::Color::White)
-      , background(sf::Color::Black)
-      , character('?')
-{}
+    : type(Type::Center),
+      offset(0, 0),
+      foreground(sf::Color::White),
+      background(sf::Color::Black),
+      character('?') {}
 
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::Tile::Tile(sf::Uint32 character,
@@ -22,12 +22,11 @@ GlyphTileMap::Tile::Tile(sf::Uint32 character,
                          const sf::Color& foreground,
                          const sf::Color& background,
                          const sf::Vector2i& offset)
-    : type(type)
-      , offset(offset)
-      , foreground(foreground)
-      , background(background)
-      , character(character)
-{}
+    : type(type),
+      offset(offset),
+      foreground(foreground),
+      background(background),
+      character(character) {}
 
 ///////////////////////////////////////////////////////////////////////////////
 void GlyphTileMap::Tile::update(sf::Uint32 delta)
@@ -41,14 +40,28 @@ void GlyphTileMap::Tile::update(sf::Uint32 delta)
 GlyphTileMap::GlyphTileMap(sf::Font& font,
                            const sf::Vector2i& area,
                            const sf::Vector2i& spacing,
-                           sf::Uint32 characterSize)
-    : m_font(font)
-      , m_area(area)
-      , m_charSize(characterSize)
-      , m_spacing(spacing)
-      , m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
-      , m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4))
-{}
+                           sf::Uint32 charSize)
+    : m_font(font),
+      m_area(area),
+      m_charSize(charSize),
+      m_spacing(spacing),
+      m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4)),
+      m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4)) {}
+
+void GlyphTileMap::create(sf::Font& font,
+                          const sf::Vector2i& area,
+                          const sf::Vector2i& spacing,
+                          sf::Uint32 charSize)
+{
+    m_font = font;
+    m_area = area;
+    m_charSize = charSize;
+    m_spacing = spacing;
+    m_foreground.setPrimitiveType(sf::Quads);
+    m_foreground.resize(static_cast<size_t>(area.x * area.y * 4));
+
+    m_background.resize(static_cast<size_t>(area.x * area.y * 4));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 const sf::Vector2i& GlyphTileMap::getArea() const
@@ -106,16 +119,32 @@ void GlyphTileMap::setTileBgColor(const sf::Vector2i& coord,
     updateBgColor(coord, color);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-sf::Vector2i GlyphTileMap::getCoordFromPosition(const sf::Vector2i& position)
+///////////////////////////////////////////////////////////////////////////
+bool GlyphTileMap::containsMouse() const
 {
-    if (!containsPosition(position)) {
+    return containsCoord(State::get().mousePosition);
+}
+
+///////////////////////////////////////////////////////////////////////////
+bool GlyphTileMap::containsCoord(const sf::Vector2i& coord) const
+{
+    auto position = this->getPosition();
+    return (coord.x > position.x &&
+            coord.x < (m_area.x * m_spacing.x) + position.x &&
+            coord.y > position.y &&
+            coord.y < (m_area.y * m_spacing.y) + position.y);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2i& coord)
+{
+    if (!containsCoord(coord)) {
         return {-1, -1};
     }
 
     auto thisPosition = this->getPosition();
-    return {(position.x - static_cast<int>(thisPosition.x)) / m_spacing.x,
-            (position.y - static_cast<int>(thisPosition.y)) / m_spacing.y};
+    return {(coord.x - static_cast<int>(thisPosition.x)) / m_spacing.x,
+            (coord.y - static_cast<int>(thisPosition.y)) / m_spacing.y};
 }
 
 ///////////////////////////////////////////////////////////////////////////////

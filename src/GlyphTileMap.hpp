@@ -16,8 +16,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
+#include "Common.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
-class GlyphTileMap : public sf::Drawable, public sf::Transformable {
+class GlyphTileMap : public DrawAndTransform {
 public:
 
     struct Tile {
@@ -101,6 +103,19 @@ public:
                  sf::Uint32 charSize);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// @brief Reconstructs the GlyphTileMap, or constructs at a later time
+    ///
+    /// @param font     Reference to a loaded sf::Font to use for glyph data
+    /// @param area     Width and height of the GlyphTileMap in # of tiles
+    /// @param spacing  Width and height of each tile in pixels
+    /// @param charSize Size of each glyph
+    ///////////////////////////////////////////////////////////////////////////
+    void create(sf::Font& font,
+                const sf::Vector2i& area,
+                const sf::Vector2i& spacing,
+                sf::Uint32 charSize);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns a const reference to the area of the GlyphTileMap
     ///
     /// @return a const reference to the area of the GlyphTileMap
@@ -173,26 +188,20 @@ public:
                         const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Checks whether a pixel coordinate is within the GlyphTileMap
+    /// @brief Returns true if the current mouse position is within the object
     ///
-    /// This is based on the inherited getPosition() method from
-    /// sf::Transformable.
-    ///
-    /// @param position Pixel coordinate to check if contained within the
-    ///                 GlyphTileMap
-    ///
-    /// @return True if the position is contained within the GlyphTileMap,
-    ///         otherwise false
+    /// @return bool    True if the mouse is within the object, false otherwise
     ///////////////////////////////////////////////////////////////////////////
-    template<typename T>
-    bool containsPosition(const sf::Vector2<T>& position) const
-    {
-        auto thisPosition = this->getPosition();
-        return (position.x > thisPosition.x &&
-                position.x < (m_area.x * m_spacing.x) + thisPosition.x &&
-                position.y > thisPosition.y &&
-                position.y < (m_area.y * m_spacing.y) + thisPosition.y);
-    }
+    bool containsMouse() const override;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns true if a coord is contained within the object
+    ///
+    /// @param coord    Coord in frame-space to check if the object contains
+    ///
+    /// @return bool    True if the coord is within the object, false otherwise
+    ///////////////////////////////////////////////////////////////////////////
+    bool containsCoord(const sf::Vector2i& coord) const override;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns the Tile coordinate corresponding to a pixel coordinate
@@ -202,7 +211,7 @@ public:
     /// @return The Tile coordinate corresponding to the position, or {-1,-1}
     ///         if the position is not contained within the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
-    sf::Vector2i getCoordFromPosition(const sf::Vector2i& position);
+    sf::Vector2i getTileCoordFromCoord(const sf::Vector2i& coord);
 
 private:
 
@@ -295,11 +304,10 @@ private:
                        const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
-
     sf::Font& m_font;
-    const sf::Vector2i m_area;
-    const sf::Uint32 m_charSize;
-    const sf::Vector2i m_spacing;
+    sf::Vector2i m_area;
+    sf::Uint32 m_charSize;
+    sf::Vector2i m_spacing;
     sf::VertexArray m_foreground;
     sf::VertexArray m_background;
 };

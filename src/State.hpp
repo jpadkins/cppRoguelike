@@ -53,9 +53,11 @@ public:
     void update() override;
 
     ///////////////////////////////////////////////////////////////////////////
+    sf::Font font;
     sf::Int32 deltaMs;
     sf::Vector2i mousePosition;
     sf::Vector2i lastMousePosition;
+    std::unique_ptr<FrameManager> frameManager;
 
 private:
 
@@ -70,9 +72,6 @@ private:
     /// The draw call passes through to all managed objects, rendering a frame
     ///////////////////////////////////////////////////////////////////////////
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
-
-    ///////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<FrameManager> m_frameManager;
 };
 
 #endif
