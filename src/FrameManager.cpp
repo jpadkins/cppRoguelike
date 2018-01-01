@@ -50,7 +50,9 @@ void FrameManager::update()
     bool mouseConsumed = false;
 
     for (auto it = m_frames.rbegin(); it != m_frames.rend(); ++it) {
-        if (!mouseConsumed) {
+        if (!mouseConsumed &&
+            ((*it)->containsMouse() || Frame::focus == (*it)->tag)) {
+
             (*it)->consumeMouse = true;
             mouseConsumed = true;
         }

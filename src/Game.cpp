@@ -24,13 +24,18 @@ class FooFrame : public Frame {
 public:
 
     FooFrame() = delete;
+
     explicit FooFrame(const std::string& tag)
         : Frame(tag), m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
     {
+        auto randColor = []() {
+            return sf::Color(rand() % 255, rand() % 255, rand() % 255);
+        };
+
         GlyphTileMap::Tile tile('x',
                                 GlyphTileMap::Tile::Center,
-                                sf::Color::Black,
-                                sf::Color::White);
+                                randColor(),
+                                randColor());
 
         for (int x = 0; x < m_glyphMap.getArea().x; ++x) {
             for (int y = 0; y < m_glyphMap.getArea().y; ++y) {
@@ -38,19 +43,53 @@ public:
             }
         }
 
-        this->setPosition(rand() % 800, rand() % 600);
+        setPosition((rand() % 800) - 80, (rand() % 600) - 80);
     }
 
-    void update() override {}
+    void update() override
+    {
+        static bool lastLeft = false;
+        static bool dragging = false;
+
+        if (consumeMouse) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                if (!dragging && !lastLeft & Frame::focus.empty()) {
+                    State::get().frameManager->setHighest(tag);
+                    Frame::focus = tag;
+                    dragging = true;
+                }
+                else if (dragging) {
+                    matchLastMouseMovement();
+                }
+                lastLeft = true;
+            }
+            else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+                State::get().frameManager->remove(tag);
+            }
+            else if (dragging || lastLeft || !Frame::focus.empty()) {
+                Frame::focus.clear();
+                lastLeft = false;
+                dragging = false;
+            }
+            consumeMouse = false;
+        }
+    }
 
     bool containsMouse() const override
     {
-        return m_glyphMap.containsMouse();
+        return containsCoord(State::get().mousePosition);
     }
 
     bool containsCoord(const sf::Vector2i& coord) const override
     {
-        return m_glyphMap.containsCoord(coord);
+        auto position = getPosition();
+        auto area = m_glyphMap.getArea();
+        auto spacing = m_glyphMap.getSpacing();
+
+        return (coord.x > position.x &&
+                coord.x < position.x + (area.x * spacing.x) &&
+                coord.y > position.y &&
+                coord.y < position.y + (area.y * spacing.y));
     }
 
 private:
@@ -129,9 +168,13 @@ void Game::updateState()
 
     // TODO: Remove this
     static int count = 0;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        State::get().frameManager->add(new FooFrame(std::to_string(count)));
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         ++count;
+        State::get().frameManager->add(new FooFrame(std::to_string(count)));
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && count > 0) {
+        State::get().frameManager->remove(std::to_string(count));
+        --count;
     }
     // TODO: ^
 }

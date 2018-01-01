@@ -16,9 +16,9 @@
 void DrawAndTransform::matchLastMouseMovement()
 {
     State& state = State::get();
-    auto position = this->getPosition();
+    auto position = getPosition();
 
-    this->setPosition(
+    setPosition(
         position.x + (state.mousePosition.x - state.lastMousePosition.x),
         position.y + (state.mousePosition.y - state.lastMousePosition.y)
     );

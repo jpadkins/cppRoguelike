@@ -7,4 +7,6 @@
 #include "Frame.hpp"
 #include "State.hpp"
 
+std::string Frame::focus = "";
+
 Frame::Frame(const std::string& tag) : tag(tag) {}

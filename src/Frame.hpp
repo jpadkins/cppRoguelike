@@ -23,8 +23,8 @@ public:
 
     void operator=(const Frame&) = delete;
 
-    bool focus = false;
     const std::string tag;
+    static std::string focus;
     bool consumeMouse = false;
 
 };

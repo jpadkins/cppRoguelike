@@ -128,11 +128,11 @@ bool GlyphTileMap::containsMouse() const
 ///////////////////////////////////////////////////////////////////////////
 bool GlyphTileMap::containsCoord(const sf::Vector2i& coord) const
 {
-    auto position = this->getPosition();
+    auto position = getPosition();
     return (coord.x > position.x &&
-            coord.x < (m_area.x * m_spacing.x) + position.x &&
+            coord.x < position.x + (m_area.x * m_spacing.x) &&
             coord.y > position.y &&
-            coord.y < (m_area.y * m_spacing.y) + position.y);
+            coord.y < position.y + (m_area.y * m_spacing.y));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
