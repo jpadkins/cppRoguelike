@@ -88,9 +88,13 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief Abstract class for all GUI elements
+/// @brief Highest parent class for all GUI elements
 ///////////////////////////////////////////////////////////////////////////////
-class Frame : public Updatable, public DrawAndTransform {};
+class Frame : public Updatable, public DrawAndTransform {
+public:
+
+    Frame() = default;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Manages the rendering of all active Frames
@@ -132,7 +136,7 @@ private:
     typedef std::pair<std::string, std::unique_ptr<Frame>> FrameHandle;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Overloaded draw frunction from sf::Drawable/sf::Transformable
+    /// @brief Overloaded draw function from sf::Drawable/sf::Transformable
     ///////////////////////////////////////////////////////////////////////////
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
@@ -172,7 +176,7 @@ void FrameManager::setHighest(const std::string& tag)
 ///////////////////////////////////////////////////////////////////////////////
 void FrameManager::add(const std::string& tag, Frame* frame)
 {
-    m_frames.emplace_back(std::make_pair(tag, std::make_unique<Frame>(frame)));
+    m_frames.emplace_back(std::make_pair(tag, std::unique_ptr<Frame>(frame)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
