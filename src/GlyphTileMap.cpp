@@ -38,39 +38,41 @@ void GlyphTileMap::Tile::update(sf::Uint32 delta)
 
 ///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::GlyphTileMap(sf::Font& font,
-                           const sf::Vector2i& area,
-                           const sf::Vector2i& spacing,
+                           const sf::Vector2u& area,
+                           const sf::Vector2u& spacing,
                            sf::Uint32 charSize)
     : m_font(font),
       m_area(area),
       m_charSize(charSize),
       m_spacing(spacing),
-      m_foreground(sf::Quads, static_cast<size_t>(area.x * area.y * 4)),
-      m_background(sf::Quads, static_cast<size_t>(area.x * area.y * 4)) {}
+      m_tiles(area.x * area.y),
+      m_foreground(sf::Quads, area.x * area.y * 4),
+      m_background(sf::Quads, area.x * area.y * 4) {}
 
 void GlyphTileMap::create(sf::Font& font,
-                          const sf::Vector2i& area,
-                          const sf::Vector2i& spacing,
+                          const sf::Vector2u& area,
+                          const sf::Vector2u& spacing,
                           sf::Uint32 charSize)
 {
     m_font = font;
     m_area = area;
     m_charSize = charSize;
     m_spacing = spacing;
+    m_tiles.resize(area.x * area.y);
     m_foreground.setPrimitiveType(sf::Quads);
-    m_foreground.resize(static_cast<size_t>(area.x * area.y * 4));
-
-    m_background.resize(static_cast<size_t>(area.x * area.y * 4));
+    m_foreground.resize(area.x * area.y * 4);
+    m_background.setPrimitiveType(sf::Quads);
+    m_background.resize(area.x * area.y * 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const sf::Vector2i& GlyphTileMap::getArea() const
+const sf::Vector2u& GlyphTileMap::getArea() const
 {
     return m_area;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const sf::Vector2i& GlyphTileMap::getSpacing() const
+const sf::Vector2u& GlyphTileMap::getSpacing() const
 {
     return m_spacing;
 }
@@ -82,13 +84,13 @@ sf::Uint32 GlyphTileMap::getCharSize() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTile(const sf::Vector2i& coord, const Tile& tile)
+void GlyphTileMap::setTile(const sf::Vector2u& coord, const Tile& tile)
 {
     updateTile(coord, tile);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTileChar(const sf::Vector2i& coord,
+void GlyphTileMap::setTileChar(const sf::Vector2u& coord,
                                sf::Uint32 character,
                                Tile::Type type,
                                const sf::Vector2i& offset)
@@ -97,7 +99,7 @@ void GlyphTileMap::setTileChar(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTileColors(const sf::Vector2i& coord,
+void GlyphTileMap::setTileColors(const sf::Vector2u& coord,
                                  sf::Color& foreground,
                                  sf::Color& background)
 {
@@ -106,14 +108,14 @@ void GlyphTileMap::setTileColors(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTileFgColor(const sf::Vector2i& coord,
+void GlyphTileMap::setTileFgColor(const sf::Vector2u& coord,
                                   const sf::Color& color)
 {
     updateFgColor(coord, color);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTileBgColor(const sf::Vector2i& coord,
+void GlyphTileMap::setTileBgColor(const sf::Vector2u& coord,
                                   const sf::Color& color)
 {
     updateBgColor(coord, color);
@@ -122,29 +124,25 @@ void GlyphTileMap::setTileBgColor(const sf::Vector2i& coord,
 ///////////////////////////////////////////////////////////////////////////
 bool GlyphTileMap::containsMouse() const
 {
-    return containsCoord(State::get().mousePosition);
+    return containsPosition(State::get().mousePosition);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-bool GlyphTileMap::containsCoord(const sf::Vector2i& coord) const
+bool GlyphTileMap::containsPosition(const sf::Vector2i& position) const
 {
-    auto position = getPosition();
-    return (coord.x > position.x &&
-            coord.x < position.x + (m_area.x * m_spacing.x) &&
-            coord.y > position.y &&
-            coord.y < position.y + (m_area.y * m_spacing.y));
+    auto thisPosition = getPosition();
+    return (position.x > thisPosition.x &&
+            position.x < thisPosition.x + (m_area.x * m_spacing.x) &&
+            position.y > thisPosition.y &&
+            position.y < thisPosition.y + (m_area.y * m_spacing.y));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2i& coord)
+sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2u& coord)
 {
-    if (!containsCoord(coord)) {
-        return {-1, -1};
-    }
-
     auto thisPosition = this->getPosition();
-    return {(coord.x - static_cast<int>(thisPosition.x)) / m_spacing.x,
-            (coord.y - static_cast<int>(thisPosition.y)) / m_spacing.y};
+    return {static_cast<int>((coord.x - thisPosition.x) / m_spacing.x),
+            static_cast<int>((coord.y - thisPosition.y) / m_spacing.y)};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +156,7 @@ void GlyphTileMap::draw(sf::RenderTarget& target,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-sf::Uint32 GlyphTileMap::getIndex(const sf::Vector2i& coord) const
+sf::Uint32 GlyphTileMap::getIndex(const sf::Vector2u& coord) const
 {
     return static_cast<sf::Uint32>((coord.y * m_area.x) + coord.x);
 }
@@ -171,25 +169,30 @@ sf::Vector2i GlyphTileMap::getOffset(const sf::Glyph& glyph,
     sf::Vector2i adjustedOffset = {0, 0};
 
     switch (type) {
-        case Tile::Text: {
+        case Tile::Text:
             adjustedOffset.x = static_cast<int>(glyph.bounds.left);
             adjustedOffset.y = static_cast<int>(m_spacing.y +
                                                 glyph.bounds.top);
-        }
             break;
         case Tile::Exact:
-            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-            adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
+            adjustedOffset.x =
+                (static_cast<int>(m_spacing.x) - glyph.textureRect.width) / 2;
+            adjustedOffset.y =
+                (static_cast<int>(m_spacing.y) - glyph.textureRect.height) / 2;
             adjustedOffset.x += offset.x;
             adjustedOffset.y += offset.y;
             break;
         case Tile::Floor:
-            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-            adjustedOffset.y = m_spacing.y - glyph.textureRect.height;
+            adjustedOffset.x =
+                (static_cast<int>(m_spacing.x) - glyph.textureRect.width) / 2;
+            adjustedOffset.y =
+                static_cast<int>(m_spacing.y) - glyph.textureRect.height;
             break;
         case Tile::Center:
-            adjustedOffset.x = (m_spacing.x - glyph.textureRect.width) / 2;
-            adjustedOffset.y = (m_spacing.y - glyph.textureRect.height) / 2;
+            adjustedOffset.x =
+                (static_cast<int>(m_spacing.x) - glyph.textureRect.width) / 2;
+            adjustedOffset.y =
+                (static_cast<int>(m_spacing.y) - glyph.textureRect.height) / 2;
             break;
     }
 
@@ -197,7 +200,7 @@ sf::Vector2i GlyphTileMap::getOffset(const sf::Glyph& glyph,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateTile(const sf::Vector2i& coord,
+void GlyphTileMap::updateTile(const sf::Vector2u& coord,
                               const Tile& tile)
 {
     const sf::Glyph& glyph = m_font.getGlyph(tile.character,
@@ -213,7 +216,7 @@ void GlyphTileMap::updateTile(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateCharacter(const sf::Vector2i& coord,
+void GlyphTileMap::updateCharacter(const sf::Vector2u& coord,
                                    sf::Uint32 character,
                                    Tile::Type type,
                                    const sf::Vector2i& offset)
@@ -228,31 +231,31 @@ void GlyphTileMap::updateCharacter(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateFgPosition(const sf::Vector2i& coord,
+void GlyphTileMap::updateFgPosition(const sf::Vector2u& coord,
                                     const sf::IntRect& texRect,
                                     const sf::Vector2i& offset)
 {
     sf::Uint32 index = getIndex(coord) * 4;
 
     m_foreground[index].position = {
-        static_cast<float>((coord.x * m_spacing.x) + offset.x),
-        static_cast<float>((coord.y * m_spacing.y) + offset.y)
+        static_cast<float>(static_cast<int>(coord.x * m_spacing.x) + offset.x),
+        static_cast<float>(static_cast<int>(coord.y * m_spacing.y) + offset.y)
     };
     m_foreground[index + 1].position = {
-        static_cast<float>((coord.x * m_spacing.x) + texRect.width
-                           + offset.x),
-        static_cast<float>((coord.y * m_spacing.y) + offset.y)
+        static_cast<float>(static_cast<int>(coord.x * m_spacing.x) +
+                           texRect.width + offset.x),
+        static_cast<float>(static_cast<int>(coord.y * m_spacing.y) + offset.y)
     };
     m_foreground[index + 2].position = {
-        static_cast<float>((coord.x * m_spacing.x) + texRect.width
-                           + offset.x),
-        static_cast<float>((coord.y * m_spacing.y) + texRect.height
-                           + offset.y)
+        static_cast<float>(static_cast<int>(coord.x * m_spacing.x) +
+                           texRect.width + offset.x),
+        static_cast<float>(static_cast<int>(coord.y * m_spacing.y) +
+                           texRect.height + offset.y)
     };
     m_foreground[index + 3].position = {
-        static_cast<float>((coord.x * m_spacing.x) + offset.x),
-        static_cast<float>((coord.y * m_spacing.y) + texRect.height
-                           + offset.y)
+        static_cast<float>(static_cast<int>(coord.x * m_spacing.x) + offset.x),
+        static_cast<float>(static_cast<int>(coord.y * m_spacing.y) +
+                           texRect.height + offset.y)
     };
     m_foreground[index].texCoords = {
         static_cast<float>(texRect.left),
@@ -273,7 +276,7 @@ void GlyphTileMap::updateFgPosition(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateFgColor(const sf::Vector2i& coord,
+void GlyphTileMap::updateFgColor(const sf::Vector2u& coord,
                                  const sf::Color& color)
 {
     sf::Uint32 index = getIndex(coord) * 4;
@@ -285,7 +288,7 @@ void GlyphTileMap::updateFgColor(const sf::Vector2i& coord,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateBgPosition(const sf::Vector2i& coord)
+void GlyphTileMap::updateBgPosition(const sf::Vector2u& coord)
 {
     sf::Uint32 index = getIndex(coord) * 4;
 
@@ -308,7 +311,7 @@ void GlyphTileMap::updateBgPosition(const sf::Vector2i& coord)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::updateBgColor(const sf::Vector2i& coord,
+void GlyphTileMap::updateBgColor(const sf::Vector2u& coord,
                                  const sf::Color& color)
 {
     sf::Uint32 index = getIndex(coord) * 4;

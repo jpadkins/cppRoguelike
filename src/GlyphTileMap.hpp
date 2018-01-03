@@ -98,8 +98,8 @@ public:
     /// @param charSize Size of each glyph
     ///////////////////////////////////////////////////////////////////////////
     GlyphTileMap(sf::Font& font,
-                 const sf::Vector2i& area,
-                 const sf::Vector2i& spacing,
+                 const sf::Vector2u& area,
+                 const sf::Vector2u& spacing,
                  sf::Uint32 charSize);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -111,8 +111,8 @@ public:
     /// @param charSize Size of each glyph
     ///////////////////////////////////////////////////////////////////////////
     void create(sf::Font& font,
-                const sf::Vector2i& area,
-                const sf::Vector2i& spacing,
+                const sf::Vector2u& area,
+                const sf::Vector2u& spacing,
                 sf::Uint32 charSize);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -120,14 +120,14 @@ public:
     ///
     /// @return a const reference to the area of the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
-    const sf::Vector2i& getArea() const;
+    const sf::Vector2u& getArea() const;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns a const reference to the spacing of the GlyphTileMap
     ///
     /// @return a const reference to the spacing of the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
-    const sf::Vector2i& getSpacing() const;
+    const sf::Vector2u& getSpacing() const;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns the character size of the GlyphTileMap
@@ -142,7 +142,7 @@ public:
     /// @param coord    Coordinate in the GlyphTileMap to update
     /// @param tile     GlyphTileMap::Tile to update the GlyphTileMap with
     ///////////////////////////////////////////////////////////////////////////
-    void setTile(const sf::Vector2i& coord, const Tile& tile);
+    void setTile(const sf::Vector2u& coord, const Tile& tile);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates the character at a coord in the GlyphTileMap
@@ -153,7 +153,7 @@ public:
     /// @param offset       Exact spacing offset value of the new character
     ///                     (default {0, 0})
     ///////////////////////////////////////////////////////////////////////////
-    void setTileChar(const sf::Vector2i& coord,
+    void setTileChar(const sf::Vector2u& coord,
                      sf::Uint32 character,
                      Tile::Type type = Tile::Center,
                      const sf::Vector2i& offset = {0, 0});
@@ -165,7 +165,7 @@ public:
     /// @param foreground   New foreground color for the tile
     /// @param background   New background color for the tile
     ///////////////////////////////////////////////////////////////////////////
-    void setTileColors(const sf::Vector2i& coord,
+    void setTileColors(const sf::Vector2u& coord,
                        sf::Color& foreground,
                        sf::Color& background);
 
@@ -175,7 +175,7 @@ public:
     /// @param coord    Coordinate in the GlyphTileMap to update
     /// @param color    New foreground color for the tile
     ///////////////////////////////////////////////////////////////////////////
-    void setTileFgColor(const sf::Vector2i& coord,
+    void setTileFgColor(const sf::Vector2u& coord,
                         const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -184,34 +184,34 @@ public:
     /// @param coord    Coordinate in the GlyphTileMap to update
     /// @param color    New background color for the tile
     ///////////////////////////////////////////////////////////////////////////
-    void setTileBgColor(const sf::Vector2i& coord,
+    void setTileBgColor(const sf::Vector2u& coord,
                         const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns true if the current mouse position is within the object
     ///
-    /// @return bool    True if the mouse is within the object, false otherwise
+    /// @return True if the mouse is within the object, false otherwise
     ///////////////////////////////////////////////////////////////////////////
     bool containsMouse() const override;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns true if a coord is contained within the object
     ///
-    /// @param coord    Coord in frame-space to check if the object contains
+    /// @param position Location in frame-space to check if the object contains
     ///
-    /// @return bool    True if the coord is within the object, false otherwise
+    /// @return True if the coord is within the object, false otherwise
     ///////////////////////////////////////////////////////////////////////////
-    bool containsCoord(const sf::Vector2i& coord) const override;
+    bool containsPosition(const sf::Vector2i& position) const override;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns the Tile coordinate corresponding to a pixel coordinate
     ///
     /// @param position Pixel coordinate to determine Tile coordinate from
     ///
-    /// @return The Tile coordinate corresponding to the position, or {-1,-1}
-    ///         if the position is not contained within the GlyphTileMap
+    /// @return The Tile coordinate corresponding to the position. This value
+    ///         may be out-of-bounds of the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
-    sf::Vector2i getTileCoordFromCoord(const sf::Vector2i& coord);
+    sf::Vector2i getTileCoordFromCoord(const sf::Vector2u& coord);
 
 private:
 
@@ -228,7 +228,7 @@ private:
     ///
     /// @return Index of the tile in a 1-dimensional array
     ///////////////////////////////////////////////////////////////////////////
-    sf::Uint32 getIndex(const sf::Vector2i& coord) const;
+    sf::Uint32 getIndex(const sf::Vector2u& coord) const;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Calculates the offset of a character given the Type of the tile
@@ -249,7 +249,7 @@ private:
     /// @param coord    Coordinate of the tile to update
     /// @param tile     Tile structure holding data to update with
     ///////////////////////////////////////////////////////////////////////////
-    void updateTile(const sf::Vector2i& coord, const Tile& tile);
+    void updateTile(const sf::Vector2u& coord, const Tile& tile);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates just the character at a coord
@@ -259,7 +259,7 @@ private:
     /// @param type         Type of the tile's new character
     /// @param offset       Offset of the tile's new character
     ///////////////////////////////////////////////////////////////////////////
-    void updateCharacter(const sf::Vector2i& coord,
+    void updateCharacter(const sf::Vector2u& coord,
                          sf::Uint32 character,
                          Tile::Type type,
                          const sf::Vector2i& offset);
@@ -271,7 +271,7 @@ private:
     /// @param texRect  IntRect with the coord of the character texture
     /// @param offset   Extra right and bottom spacing
     ///////////////////////////////////////////////////////////////////////////
-    void updateFgPosition(const sf::Vector2i& coord,
+    void updateFgPosition(const sf::Vector2u& coord,
                           const sf::IntRect& texRect,
                           const sf::Vector2i& offset);
 
@@ -281,7 +281,7 @@ private:
     /// @param coord    Coordinate of the tile to update
     /// @param color    Color for each of the vertices
     ///////////////////////////////////////////////////////////////////////////
-    void updateFgColor(const sf::Vector2i& coord,
+    void updateFgColor(const sf::Vector2u& coord,
                        const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ private:
     ///
     /// @param coord   Coordinates of the tile to update
     /////////////////////////////////////////////////////////////////////////// 
-    void updateBgPosition(const sf::Vector2i& coord);
+    void updateBgPosition(const sf::Vector2u& coord);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Update the background vertices' colors at a coord
@@ -300,14 +300,15 @@ private:
     /// @param coord    Coordinate of the tile to update
     /// @param color    Color for each of the vertices
     ///////////////////////////////////////////////////////////////////////////
-    void updateBgColor(const sf::Vector2i& coord,
+    void updateBgColor(const sf::Vector2u& coord,
                        const sf::Color& color);
 
     ///////////////////////////////////////////////////////////////////////////
     sf::Font& m_font;
-    sf::Vector2i m_area;
+    sf::Vector2u m_area;
     sf::Uint32 m_charSize;
-    sf::Vector2i m_spacing;
+    sf::Vector2u m_spacing;
+    std::vector<Tile> m_tiles;
     sf::VertexArray m_foreground;
     sf::VertexArray m_background;
 };

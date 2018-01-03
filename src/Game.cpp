@@ -37,8 +37,8 @@ public:
                                 randColor(),
                                 randColor());
 
-        for (int x = 0; x < m_glyphMap.getArea().x; ++x) {
-            for (int y = 0; y < m_glyphMap.getArea().y; ++y) {
+        for (uint32_t x = 0; x < m_glyphMap.getArea().x; ++x) {
+            for (uint32_t y = 0; y < m_glyphMap.getArea().y; ++y) {
                 m_glyphMap.setTile({x, y}, tile);
             }
         }
@@ -77,19 +77,19 @@ public:
 
     bool containsMouse() const override
     {
-        return containsCoord(State::get().mousePosition);
+        return containsPosition(State::get().mousePosition);
     }
 
-    bool containsCoord(const sf::Vector2i& coord) const override
+    bool containsPosition(const sf::Vector2i& position) const override
     {
-        auto position = getPosition();
+        auto thisPosition = getPosition();
         auto area = m_glyphMap.getArea();
         auto spacing = m_glyphMap.getSpacing();
 
-        return (coord.x > position.x &&
-                coord.x < position.x + (area.x * spacing.x) &&
-                coord.y > position.y &&
-                coord.y < position.y + (area.y * spacing.y));
+        return (position.x > thisPosition.x &&
+                position.x < thisPosition.x + (area.x * spacing.x) &&
+                position.y > thisPosition.y &&
+                position.y < thisPosition.y + (area.y * spacing.y));
     }
 
 private:

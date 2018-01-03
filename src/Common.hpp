@@ -72,18 +72,18 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns true if the current mouse position is within the object
     ///
-    /// @return bool    True if the mouse is within the object, false otherwise
+    /// @return True if the mouse is within the object, false otherwise
     ///////////////////////////////////////////////////////////////////////////
     virtual bool containsMouse() const = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns true if a coord is contained within the object
     ///
-    /// @param coord    Coord in frame-space to check if the object contains
+    /// @param position Location in frame-space to check if the object contains
     ///
-    /// @return bool    True if the coord is within the object, false otherwise
+    /// @return True if the coord is within the object, false otherwise
     ///////////////////////////////////////////////////////////////////////////
-    virtual bool containsCoord(const sf::Vector2i& coord) const = 0;
+    virtual bool containsPosition(const sf::Vector2i& position) const = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates the position to mirror the last mouse position delta
