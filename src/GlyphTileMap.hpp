@@ -43,7 +43,7 @@ public:
         /// This should be some self-contained lambda that takes a Tile
         /// reference and a delta time value and updates the Tile's appearance
         ///////////////////////////////////////////////////////////////////////
-        typedef std::function<void(GlyphTileMap::Tile&, sf::Uint32)> Animation;
+        typedef std::function<void(GlyphTileMap::Tile&, sf::Int32)> Animation;
 
         ///////////////////////////////////////////////////////////////////////
         /// @brief Default Tile constructor
@@ -76,9 +76,9 @@ public:
         ///////////////////////////////////////////////////////////////////////
         /// @brief Invokes a Tile's animation callback if it has one
         ///
-        /// @param delta    Delta time value in ms
+        /// @param deltaMs  Delta time value in ms
         ///////////////////////////////////////////////////////////////////////
-        void update(sf::Uint32 delta);
+        void update(sf::Int32 deltaMs);
 
         ///////////////////////////////////////////////////////////////////////
         Type type;
@@ -212,6 +212,13 @@ public:
     ///         may be out-of-bounds of the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
     sf::Vector2i getTileCoordFromCoord(const sf::Vector2u& coord);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Updates all the contained Tiles
+    ///
+    /// Should be called once per frame
+    ///////////////////////////////////////////////////////////////////////////
+    void update();
 
 private:
 

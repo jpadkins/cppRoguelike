@@ -29,7 +29,7 @@ GlyphTileMap::Tile::Tile(sf::Uint32 character,
       character(character) {}
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::Tile::update(sf::Uint32 delta)
+void GlyphTileMap::Tile::update(sf::Int32 delta)
 {
     if (animation) {
         animation(*this, delta);
@@ -143,6 +143,15 @@ sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2u& coord)
     auto thisPosition = this->getPosition();
     return {static_cast<int>((coord.x - thisPosition.x) / m_spacing.x),
             static_cast<int>((coord.y - thisPosition.y) / m_spacing.y)};
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void GlyphTileMap::update()
+{
+    auto deltaMs = State::get().deltaMs;
+    for (auto& tile : m_tiles) {
+        tile.update(deltaMs);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

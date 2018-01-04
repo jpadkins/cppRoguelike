@@ -1,32 +1,37 @@
 ///////////////////////////////////////////////////////////////////////////////
-/// @file   Frame.hpp
+/// @file   Window.hpp
 /// @author Jacob Adkins (jpadkins)
-/// @brief  Parent class of all Gui Elements
+/// @brief  Parent class of all Gui elements
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef ROGUELIKE__FRAME_HPP
 #define ROGUELIKE__FRAME_HPP
+
+///////////////////////////////////////////////////////////////////////////////
+/// Headers
+///////////////////////////////////////////////////////////////////////////////
 
 #include "Common.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Highest parent class for all GUI elements
 ///////////////////////////////////////////////////////////////////////////////
-class Frame : public Updatable, public DrawAndTransform {
+class Window : public DrawAndTransform {
 public:
 
-    explicit Frame(const std::string& tag);
+    explicit Window(const std::string& tag);
 
-    Frame() = delete;
+    Window() = delete;
 
-    Frame(const Frame&) = delete;
+    Window(const Window&) = delete;
 
-    void operator=(const Frame&) = delete;
+    void operator=(const Window&) = delete;
+
+    virtual void update() = 0;
 
     const std::string tag;
     static std::string focus;
     bool consumeMouse = false;
-
 };
 
 #endif

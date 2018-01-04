@@ -16,17 +16,17 @@
 
 #include "State.hpp"
 #include "Common.hpp"
-#include "FrameManager.hpp"
+#include "WindowManager.hpp"
 #include "GlyphTileMap.hpp"
 
 // TODO: Remove this
-class FooFrame : public Frame {
+class FooWindow : public Window {
 public:
 
-    FooFrame() = delete;
+    FooWindow() = delete;
 
-    explicit FooFrame(const std::string& tag)
-        : Frame(tag), m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
+    explicit FooWindow(const std::string& tag)
+        : Window(tag), m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
     {
         auto randColor = []() {
             return sf::Color(rand() % 255, rand() % 255, rand() % 255);
@@ -48,30 +48,28 @@ public:
 
     void update() override
     {
-        static bool lastLeft = false;
-        static bool dragging = false;
-
         if (consumeMouse) {
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                if (!dragging && !lastLeft & Frame::focus.empty()) {
-                    State::get().frameManager->setHighest(tag);
-                    Frame::focus = tag;
-                    dragging = true;
+                if (!m_dragging && !m_lastLeft & Window::focus.empty() &&
+                    State::get().leftClick) {
+
+                    State::get().windowManager->setHighest(tag);
+                    Window::focus = tag;
+                    m_dragging = true;
                 }
-                else if (dragging) {
+                else if (m_dragging) {
                     matchLastMouseMovement();
                 }
-                lastLeft = true;
+                m_lastLeft = true;
             }
             else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-                State::get().frameManager->remove(tag);
+                State::get().windowManager->remove(tag);
             }
-            else if (dragging || lastLeft || !Frame::focus.empty()) {
-                Frame::focus.clear();
-                lastLeft = false;
-                dragging = false;
+            else if (m_dragging || m_lastLeft || !Window::focus.empty()) {
+                Window::focus.clear();
+                m_lastLeft = false;
+                m_dragging = false;
             }
-            consumeMouse = false;
         }
     }
 
@@ -100,6 +98,8 @@ private:
         target.draw(m_glyphMap, states);
     }
 
+    bool m_lastLeft = false;
+    bool m_dragging = false;
     GlyphTileMap m_glyphMap;
 
 };
@@ -131,10 +131,13 @@ Game::Game(Settings& settings) : m_frameSize(settings.frame.size)
 void Game::play()
 {
     sf::Clock clock;
+    State& state = State::get();
 
     while (m_window.isOpen()) {
         updateFrameMouseCoord();
-        State::get().deltaMs = clock.restart().asMilliseconds();
+        state.leftClick = false;
+        state.rightClick = false;
+        state.deltaMs = clock.restart().asMilliseconds();
 
         sf::Event event;
         while (m_window.pollEvent(event)) {
@@ -145,6 +148,18 @@ void Game::play()
                 case sf::Event::Resized:
                     updateFrameScale();
                     break;
+                case sf::Event::MouseButtonPressed:
+                    switch (event.mouseButton.button) {
+                        case sf::Mouse::Left:
+                            state.leftClick = true;
+                            break;
+                        case sf::Mouse::Right:
+                            state.rightClick = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -153,7 +168,7 @@ void Game::play()
         updateState();
         renderFrame();
 
-        State::get().lastMousePosition = State::get().mousePosition;
+        state.lastMousePosition = State::get().mousePosition;
     }
 }
 
@@ -166,14 +181,18 @@ void Game::updateState()
         m_window.close();
     }
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        State::get().showDebug = true;
+    }
+
     // TODO: Remove this
     static int count = 0;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         ++count;
-        State::get().frameManager->add(new FooFrame(std::to_string(count)));
+        State::get().windowManager->add(new FooWindow(std::to_string(count)));
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && count > 0) {
-        State::get().frameManager->remove(std::to_string(count));
+        State::get().windowManager->remove(std::to_string(count));
         --count;
     }
     // TODO: ^

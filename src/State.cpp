@@ -7,7 +7,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "State.hpp"
-#include "FrameManager.hpp"
+#include "DebugManager.hpp"
+#include "WindowManager.hpp"
 
 // TODO: State should load from a config file eventually
 static const std::string fontFile = "assets/unifont.ttf";
@@ -22,19 +23,26 @@ State& State::get()
 ///////////////////////////////////////////////////////////////////////////////
 void State::update()
 {
-    frameManager->update();
+    windowManager->update();
+    m_debugManager->update();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-State::State() : frameManager(new FrameManager())
+State::State() : windowManager(new WindowManager())
 {
     if (!font.loadFromFile(fontFile)) {
         log_exit("Font loading failed: " + fontFile);
     }
+
+    m_debugManager = std::make_unique<DebugManager>(font);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void State::draw(sf::RenderTarget& target, sf::RenderStates) const
 {
-    target.draw(*frameManager);
+    target.draw(*windowManager);
+
+    if (showDebug) {
+        target.draw(*m_debugManager);
+    }
 }

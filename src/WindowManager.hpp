@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-/// @file   FrameManager.hpp
+/// @file   WindowManager.hpp
 /// @author Jacob Adkins (jpadkins)
-/// @brief  Class that manages Frames (windows in the GUI)
+/// @brief  Class that manages open Windows (in the GUI)
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef ROGUELIKE__FRAME_MANAGER_HPP
@@ -14,69 +14,69 @@
 #include <list>
 #include <SFML/Graphics.hpp>
 
-#include "Frame.hpp"
 #include "Common.hpp"
+#include "Window.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief Manages the rendering of all active Frames
+/// @brief Manages the rendering of all active Windows
 ///////////////////////////////////////////////////////////////////////////////
-class FrameManager : public Updatable, public sf::Drawable {
+class WindowManager : public sf::Drawable {
 public:
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Default constructor
     ///////////////////////////////////////////////////////////////////////////
-    FrameManager() = default;
+    WindowManager() = default;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Removes an open Frame
+    /// @brief Removes an open Window
     ///
-    /// @param tag  Tag of the Frame to remove
+    /// @param tag  Tag of the Window to remove
     ///////////////////////////////////////////////////////////////////////////
     void remove(const std::string& tag);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Moves a Frame with a matching tag to the highest z-level
+    /// @brief Moves a Window with a matching tag to the highest z-level
     ///
-    /// @param tag  Tag of the Frame to move to ontop of all the others
+    /// @param tag  Tag of the Window to move to ontop of all the others
     ///////////////////////////////////////////////////////////////////////////
     void setHighest(const std::string& tag);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Adds a new Frame to be managed
+    /// @brief Adds a new Window to be managed
     ///
-    /// @param frame    Pointer to the Frame to be managed
+    /// @param frame    Pointer to the Window to be managed
     ///////////////////////////////////////////////////////////////////////////
-    void add(Frame* frame);
+    void add(Window* frame);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates all managed frames
     ///
     /// The global State instance should call this once per frame
     ///////////////////////////////////////////////////////////////////////////
-    void update() override;
+    void update();
 
 private:
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Typedefs
     ///////////////////////////////////////////////////////////////////////////
-    typedef std::list<std::unique_ptr<Frame>> FrameList;
+    typedef std::list<std::unique_ptr<Window>> WindowList;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Overloaded draw function from sf::Drawable/sf::Transformable
     ///
-    /// Draws all managed Frames
+    /// Draws all managed Windows
     ///////////////////////////////////////////////////////////////////////////
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Returns an iterator to the first FrameHandle with a matching tag
+    /// @brief Returns an iterator to the first WindowHandle with a matching tag
     ///////////////////////////////////////////////////////////////////////////
-    FrameList::iterator getFrameIter(const std::string& tag);
+    WindowList::iterator getWindowIter(const std::string& tag);
 
     ///////////////////////////////////////////////////////////////////////////
-    FrameList m_frames;
+    WindowList m_frames;
 };
 
 #endif
