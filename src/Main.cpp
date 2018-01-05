@@ -21,11 +21,11 @@ int main()
     auto windowMode = sf::VideoMode::getFullscreenModes()[0];
     Game::Settings gameSettings = {
         {
-            true,
+            false,
             sf::Style::Fullscreen,
             "SFML App",
             windowMode,
-            60
+            0
         },
         {
             {800, 600}

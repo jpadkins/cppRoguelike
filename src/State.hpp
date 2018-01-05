@@ -13,11 +13,28 @@
 /// Headers
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <memory>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "Common.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+/// @brief Enum of all keyboard inputs used by the game
+///////////////////////////////////////////////////////////////////////////////
+enum class Key {
+    A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y,
+    Z, Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Esc, Ctrl,
+    Shift, Alt, Space, Left, Right, Up, Down, Count
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// @brief Enum describing mouse input buttons
+///////////////////////////////////////////////////////////////////////////////
+enum class MouseButton {
+    Left, Right
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Forward declarations for State
@@ -54,11 +71,51 @@ public:
     void update();
 
     ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns pressed status of a given key
+    ///
+    /// @param key  Key value to check
+    ///
+    /// @return True if the key is pressed, false otherwise
+    ///////////////////////////////////////////////////////////////////////////
+    bool getKeyStatus(Key key);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Sets the pressed status of all keys based on sf::Keyboard
+    ///
+    /// This should be called once per frame
+    ///////////////////////////////////////////////////////////////////////////
+    void updateKeyStatuses();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Sets the pressed status for all keys to false
+    ///////////////////////////////////////////////////////////////////////////
+    void clearAllKeys();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Updates a key mapping
+    ///
+    /// If another Key is bound to sfKey, then the sfKey bound to that Key
+    /// will be swapped with this one.
+    ///
+    /// @param key      Key value to update
+    /// @param sfKey    New sf::Keyboard::Key value to tie the Key to
+    ///////////////////////////////////////////////////////////////////////////
+    void rebindKey(Key key, sf::Keyboard::Key sfKey);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns the pressed state of a mouse button
+    ///
+    /// This is more for brevity's sake than decoupling SFML
+    ///////////////////////////////////////////////////////////////////////////
+    bool getMouseStatus(MouseButton button);
+
+    ///////////////////////////////////////////////////////////////////////////
     sf::Font font;
     sf::Int32 deltaMs = 0;
     bool showDebug = false;
     bool leftClick = false;
     bool rightClick = false;
+    float mouseScrollDelta = 0.0f;
     sf::Vector2i mousePosition = {0,0};
     sf::Vector2i lastMousePosition = {0,0};
     std::unique_ptr<WindowManager> windowManager;
@@ -78,6 +135,8 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
     std::unique_ptr<DebugManager> m_debugManager;
+    std::array <bool, static_cast<int>(Key::Count)> m_keyStatuses;
+    std::array<sf::Keyboard::Key, static_cast<int>(Key::Count)> m_keyMappings;
 };
 
 #endif

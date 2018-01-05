@@ -17,8 +17,8 @@ void WindowManager::remove(const std::string& tag)
 {
     auto frameIter = getWindowIter(tag);
 
-    if (frameIter != m_frames.end()) {
-        m_frames.erase(frameIter);
+    if (frameIter != m_windows.end()) {
+        m_windows.erase(frameIter);
     }
     else {
         log_warn("Window is not open: " + tag);
@@ -30,8 +30,8 @@ void WindowManager::setHighest(const std::string& tag)
 {
     auto frameIter = getWindowIter(tag);
 
-    if (frameIter != m_frames.end()) {
-        m_frames.splice(m_frames.end(), m_frames, frameIter);
+    if (frameIter != m_windows.end()) {
+        m_windows.splice(m_windows.end(), m_windows, frameIter);
     }
     else {
         log_warn("Window is not open: " + tag);
@@ -41,7 +41,7 @@ void WindowManager::setHighest(const std::string& tag)
 ///////////////////////////////////////////////////////////////////////////////
 void WindowManager::add(Window* frame)
 {
-    m_frames.emplace_back(std::unique_ptr<Window>(frame));
+    m_windows.emplace_back(std::unique_ptr<Window>(frame));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ void WindowManager::update()
 {
     bool mouseConsumed = false;
 
-    for (auto it = m_frames.rbegin(); it != m_frames.rend(); ++it) {
+    for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
         if (!mouseConsumed &&
             ((*it)->containsMouse() || Window::focus == (*it)->tag)) {
 
@@ -67,7 +67,7 @@ void WindowManager::update()
 ///////////////////////////////////////////////////////////////////////////////
 void WindowManager::draw(sf::RenderTarget& target, sf::RenderStates) const
 {
-    for (auto& frame : m_frames) { target.draw(*frame); }
+    for (auto& frame : m_windows) { target.draw(*frame); }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,5 +78,5 @@ WindowManager::WindowList::iterator WindowManager::getWindowIter(
         return frame->tag == tag;
     };
 
-    return std::find_if(m_frames.begin(), m_frames.end(), tagsEqual);
+    return std::find_if(m_windows.begin(), m_windows.end(), tagsEqual);
 }

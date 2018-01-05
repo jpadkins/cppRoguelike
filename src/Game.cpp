@@ -16,17 +16,20 @@
 
 #include "State.hpp"
 #include "Common.hpp"
-#include "WindowManager.hpp"
 #include "GlyphTileMap.hpp"
+#include "WindowManager.hpp"
+#include "DraggableWindow.hpp"
+
 
 // TODO: Remove this
-class FooWindow : public Window {
+class FooWindow : public DraggableWindow {
 public:
 
     FooWindow() = delete;
 
     explicit FooWindow(const std::string& tag)
-        : Window(tag), m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
+        : DraggableWindow(tag),
+          m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
     {
         auto randColor = []() {
             return sf::Color(rand() % 255, rand() % 255, rand() % 255);
@@ -48,28 +51,10 @@ public:
 
     void update() override
     {
-        if (consumeMouse) {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                if (!m_dragging && !m_lastLeft & Window::focus.empty() &&
-                    State::get().leftClick) {
+        DraggableWindow::updateDrag();
 
-                    State::get().windowManager->setHighest(tag);
-                    Window::focus = tag;
-                    m_dragging = true;
-                }
-                else if (m_dragging) {
-                    matchLastMouseMovement();
-                }
-                m_lastLeft = true;
-            }
-            else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-                State::get().windowManager->remove(tag);
-            }
-            else if (m_dragging || m_lastLeft || !Window::focus.empty()) {
-                Window::focus.clear();
-                m_lastLeft = false;
-                m_dragging = false;
-            }
+        if (consumeMouse && State::get().rightClick) {
+            State::get().windowManager->remove(tag);
         }
     }
 
@@ -98,8 +83,6 @@ private:
         target.draw(m_glyphMap, states);
     }
 
-    bool m_lastLeft = false;
-    bool m_dragging = false;
     GlyphTileMap m_glyphMap;
 
 };
@@ -131,13 +114,12 @@ Game::Game(Settings& settings) : m_frameSize(settings.frame.size)
 void Game::play()
 {
     sf::Clock clock;
-    State& state = State::get();
 
     while (m_window.isOpen()) {
         updateFrameMouseCoord();
-        state.leftClick = false;
-        state.rightClick = false;
-        state.deltaMs = clock.restart().asMilliseconds();
+        State::get().leftClick = false;
+        State::get().rightClick = false;
+        State::get().deltaMs = clock.restart().asMilliseconds();
 
         sf::Event event;
         while (m_window.pollEvent(event)) {
@@ -151,24 +133,30 @@ void Game::play()
                 case sf::Event::MouseButtonPressed:
                     switch (event.mouseButton.button) {
                         case sf::Mouse::Left:
-                            state.leftClick = true;
+                            State::get().leftClick = true;
                             break;
                         case sf::Mouse::Right:
-                            state.rightClick = true;
+                            State::get().rightClick = true;
                             break;
                         default:
                             break;
                     }
+                    break;
+                case sf::Event::MouseWheelScrolled:
+                    State::get().mouseScrollDelta
+                        = event.mouseWheelScroll.delta;
                     break;
                 default:
                     break;
             }
         }
 
+        State::get().updateKeyStatuses();
+
         updateState();
         renderFrame();
 
-        state.lastMousePosition = State::get().mousePosition;
+        State::get().lastMousePosition = State::get().mousePosition;
     }
 }
 
@@ -177,21 +165,21 @@ void Game::updateState()
 {
     State::get().update();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+    if (State::get().getKeyStatus(Key::Esc)) {
         m_window.close();
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+    if (State::get().getKeyStatus(Key::D)) {
         State::get().showDebug = true;
     }
 
     // TODO: Remove this
     static int count = 0;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+    if (State::get().getKeyStatus(Key::A)) {
         ++count;
         State::get().windowManager->add(new FooWindow(std::to_string(count)));
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && count > 0) {
+    else if (State::get().getKeyStatus(Key::R) && count > 0) {
         State::get().windowManager->remove(std::to_string(count));
         --count;
     }

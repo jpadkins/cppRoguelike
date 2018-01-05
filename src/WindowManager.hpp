@@ -4,8 +4,8 @@
 /// @brief  Class that manages open Windows (in the GUI)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef ROGUELIKE__FRAME_MANAGER_HPP
-#define ROGUELIKE__FRAME_MANAGER_HPP
+#ifndef ROGUELIKE__WINDOW_MANAGER_HPP
+#define ROGUELIKE__WINDOW_MANAGER_HPP
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Headers
@@ -76,7 +76,7 @@ private:
     WindowList::iterator getWindowIter(const std::string& tag);
 
     ///////////////////////////////////////////////////////////////////////////
-    WindowList m_frames;
+    WindowList m_windows;
 };
 
 #endif
