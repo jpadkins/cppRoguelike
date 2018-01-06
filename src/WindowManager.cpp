@@ -15,10 +15,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 void WindowManager::remove(const std::string& tag)
 {
-    auto frameIter = getWindowIter(tag);
+    auto it = getWindowIter(tag);
 
-    if (frameIter != m_windows.end()) {
-        m_windows.erase(frameIter);
+    if (it != m_windows.end()) {
+        m_windows.erase(it);
     }
     else {
         log_warn("Window is not open: " + tag);
@@ -28,10 +28,10 @@ void WindowManager::remove(const std::string& tag)
 ///////////////////////////////////////////////////////////////////////////////
 void WindowManager::setHighest(const std::string& tag)
 {
-    auto frameIter = getWindowIter(tag);
+    auto it = getWindowIter(tag);
 
-    if (frameIter != m_windows.end()) {
-        m_windows.splice(m_windows.end(), m_windows, frameIter);
+    if (it != m_windows.end()) {
+        m_windows.splice(m_windows.end(), m_windows, it);
     }
     else {
         log_warn("Window is not open: " + tag);
@@ -48,8 +48,11 @@ void WindowManager::add(Window* frame)
 void WindowManager::update()
 {
     bool mouseConsumed = false;
+    auto it = m_windows.rbegin();
 
-    for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
+    while (it != m_windows.rend()) {
+
+        // Update window
         if (!mouseConsumed &&
             ((*it)->containsMouse() || Window::focus == (*it)->tag)) {
 
@@ -61,6 +64,15 @@ void WindowManager::update()
         }
 
         (*it)->update();
+
+        // Remove if need be
+        if ((*it)->shouldClose) {
+            auto tmpIt = it;
+            std::advance(tmpIt, 1);
+            m_windows.erase(tmpIt.base());
+        }
+
+        ++it;
     }
 }
 

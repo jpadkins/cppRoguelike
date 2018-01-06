@@ -67,7 +67,7 @@ public:
         DraggableWindow::updateDrag();
 
         if (consumeMouse && State::get().rightClick) {
-            State::get().windowManager->remove(tag);
+            shouldClose = true;
         }
 
         m_glyphMap.update();

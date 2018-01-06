@@ -45,6 +45,7 @@ public:
 
     ///////////////////////////////////////////////////////////////////////////
     const std::string tag;
+    bool shouldClose = false;
     static std::string focus;
     bool consumeMouse = false;
 };
