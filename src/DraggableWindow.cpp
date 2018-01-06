@@ -22,8 +22,8 @@ void DraggableWindow::updateDrag()
     if (consumeMouse) {
         if (State::get().getMouseStatus(MouseButton::Left)) {
             if (!m_dragging &&
+                Window::focus.empty() &&
                 State::get().leftClick &&
-                !m_lastPressed & Window::focus.empty() &&
                 withinDraggableRegion(State::get().mousePosition)) {
 
                 State::get().windowManager->setHighest(tag);
@@ -33,11 +33,9 @@ void DraggableWindow::updateDrag()
             else if (m_dragging) {
                 matchLastMouseMovement();
             }
-            m_lastPressed = true;
         }
-        else if (m_dragging || m_lastPressed || !Window::focus.empty()) {
+        else if (m_dragging || !Window::focus.empty()) {
             Window::focus.clear();
-            m_lastPressed = false;
             m_dragging = false;
         }
     }

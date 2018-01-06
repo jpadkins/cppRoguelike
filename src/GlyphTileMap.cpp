@@ -29,14 +29,6 @@ GlyphTileMap::Tile::Tile(sf::Uint32 character,
       character(character) {}
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::Tile::update(sf::Int32 delta)
-{
-    if (animation) {
-        animation(*this, delta);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 GlyphTileMap::GlyphTileMap(sf::Font& font,
                            const sf::Vector2u& area,
                            const sf::Vector2u& spacing,
@@ -87,15 +79,18 @@ sf::Uint32 GlyphTileMap::getCharSize() const
 void GlyphTileMap::setTile(const sf::Vector2u& coord, const Tile& tile)
 {
     updateTile(coord, tile);
+    m_tiles[getIndex(coord)] = tile;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void GlyphTileMap::setTileChar(const sf::Vector2u& coord,
-                               sf::Uint32 character,
-                               Tile::Type type,
-                               const sf::Vector2i& offset)
+void GlyphTileMap::setTileCharacter(const sf::Vector2u& coord,
+                                    sf::Uint32 character,
+                                    Tile::Type type,
+                                    const sf::Vector2i& offset)
 {
     updateCharacter(coord, character, type, offset);
+    m_tiles[getIndex(coord)].character = character;
+    m_tiles[getIndex(coord)].type = type;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,6 +100,8 @@ void GlyphTileMap::setTileColors(const sf::Vector2u& coord,
 {
     updateFgColor(coord, foreground);
     updateBgColor(coord, background);
+    m_tiles[getIndex(coord)].foreground = foreground;
+    m_tiles[getIndex(coord)].background = background;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,6 +109,7 @@ void GlyphTileMap::setTileFgColor(const sf::Vector2u& coord,
                                   const sf::Color& color)
 {
     updateFgColor(coord, color);
+    m_tiles[getIndex(coord)].foreground = color;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,6 +117,15 @@ void GlyphTileMap::setTileBgColor(const sf::Vector2u& coord,
                                   const sf::Color& color)
 {
     updateBgColor(coord, color);
+    m_tiles[getIndex(coord)].background = color;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+void GlyphTileMap::setTileAnimation(const sf::Vector2u& coord,
+                                    const Tile::Animation& animation)
+{
+    m_tiles[getIndex(coord)].animation = animation;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -149,8 +156,17 @@ sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2u& coord)
 void GlyphTileMap::update()
 {
     auto deltaMs = State::get().deltaMs;
-    for (auto& tile : m_tiles) {
-        tile.update(deltaMs);
+
+    // Important: This relies on the layout of m_tiles, but should be a lot
+    // faster than calling getIndex() for every animated tile in every map
+    for (sf::Uint32 x = 0; x < m_area.y; ++x) {
+        for (sf::Uint32 y = 0; y < m_area.y; ++y) {
+            auto index = getIndex({x, y});
+            if (m_tiles[index].animation) {
+                m_tiles[index].animation(m_tiles[index], deltaMs);
+                updateTile({x, y}, m_tiles[index]);
+            }
+        }
     }
 }
 

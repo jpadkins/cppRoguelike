@@ -35,10 +35,23 @@ public:
             return sf::Color(rand() % 255, rand() % 255, rand() % 255);
         };
 
+        auto changeColor = [count = 0] (GlyphTileMap::Tile& tile,
+                                        sf::Int32 deltaMs) mutable {
+
+            count += deltaMs;
+            if (count > 1000) {
+                tile.foreground = sf::Color(rand() % 255, rand() % 255,
+                                            rand() % 255);
+                count -= 500;
+            }
+        };
+
         GlyphTileMap::Tile tile('x',
                                 GlyphTileMap::Tile::Center,
                                 randColor(),
                                 randColor());
+
+        tile.animation = changeColor;
 
         for (uint32_t x = 0; x < m_glyphMap.getArea().x; ++x) {
             for (uint32_t y = 0; y < m_glyphMap.getArea().y; ++y) {
@@ -56,6 +69,8 @@ public:
         if (consumeMouse && State::get().rightClick) {
             State::get().windowManager->remove(tag);
         }
+
+        m_glyphMap.update();
     }
 
     bool containsMouse() const override

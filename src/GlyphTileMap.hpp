@@ -74,13 +74,6 @@ public:
              const sf::Vector2i& offset = {0, 0});
 
         ///////////////////////////////////////////////////////////////////////
-        /// @brief Invokes a Tile's animation callback if it has one
-        ///
-        /// @param deltaMs  Delta time value in ms
-        ///////////////////////////////////////////////////////////////////////
-        void update(sf::Int32 deltaMs);
-
-        ///////////////////////////////////////////////////////////////////////
         Type type;
         sf::Vector2i offset;
         Animation animation;
@@ -170,10 +163,10 @@ public:
     /// @param offset       Exact spacing offset value of the new character
     ///                     (default {0, 0})
     ///////////////////////////////////////////////////////////////////////////
-    void setTileChar(const sf::Vector2u& coord,
-                     sf::Uint32 character,
-                     Tile::Type type = Tile::Center,
-                     const sf::Vector2i& offset = {0, 0});
+    void setTileCharacter(const sf::Vector2u& coord,
+                          sf::Uint32 character,
+                          Tile::Type type = Tile::Center,
+                          const sf::Vector2i& offset = {0, 0});
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates the foreground and background colors at a coord
@@ -203,6 +196,17 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void setTileBgColor(const sf::Vector2u& coord,
                         const sf::Color& color);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Updates the animation at a coord
+    ///
+    /// Pass in nullptr to clear the tile's animation
+    ///
+    /// @param coord        Coordinate in the GlyphTileMap to update
+    /// @param animation    New animation color for the tile
+    ///////////////////////////////////////////////////////////////////////////
+    void setTileAnimation(const sf::Vector2u& coord,
+                          const Tile::Animation& animation);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Returns true if the current mouse position is within the object
