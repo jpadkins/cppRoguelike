@@ -29,7 +29,7 @@ public:
 
     explicit FooWindow(const std::string& tag)
         : DraggableWindow(tag),
-          m_glyphMap(State::get().font, {10, 10}, {16, 16}, 16)
+          m_glyphMap(State::get().font, {10, 10}, {32, 32}, 32)
     {
         auto randColor = []() {
             return sf::Color(rand() % 255, rand() % 255, rand() % 255);

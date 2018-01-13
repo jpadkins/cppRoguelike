@@ -31,8 +31,9 @@ void WindowManager::setHighest(const std::string& tag)
     auto it = getWindowIter(tag);
 
     if (it != m_windows.end()) {
-        m_windows.emplace_back(std::move(*it));
+        auto tempPtr = std::move(*it);
         m_windows.erase(it);
+        m_windows.emplace_back(std::move(tempPtr));
     }
     else {
         log_warn("Window is not open: " + tag);
