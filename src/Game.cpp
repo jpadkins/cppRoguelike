@@ -35,8 +35,8 @@ public:
             return sf::Color(rand() % 255, rand() % 255, rand() % 255);
         };
 
-        auto changeColor = [count = 0] (GlyphTileMap::Tile& tile,
-                                        sf::Int32 deltaMs) mutable {
+        auto changeColor = [count = 0](GlyphTileMap::Tile& tile,
+                                       sf::Int32 deltaMs) mutable {
 
             count += deltaMs;
             if (count > 1000) {
@@ -104,23 +104,25 @@ private:
 // TODO: ^
 
 ///////////////////////////////////////////////////////////////////////////////
-Game::Game(Settings& settings) : m_frameSize(settings.frame.size)
+Game::Game(Settings& settings)
 {
-    m_window.create(settings.window.mode,
-                    settings.window.title,
-                    settings.window.style);
+    State::get().frameSize = settings.frame.size;
+    State::get().gameWindow.create(settings.window.mode,
+                                   settings.window.title,
+                                   settings.window.style);
 
-    if (!m_window.isOpen()) {
+    if (!State::get().gameWindow.isOpen()) {
         log_exit("Could not open window");
     }
-    else if (!m_frame.create(m_frameSize.x, m_frameSize.y)) {
+    else if (!State::get().frameBuffer.create(settings.frame.size.x,
+                                              settings.frame.size.y)) {
         log_exit("Could not create frame buffer");
     }
 
-    m_window.setVerticalSyncEnabled(settings.window.vsync);
-    m_window.setFramerateLimit(settings.window.fpsLimit);
-    m_window.setMouseCursorVisible(true);
-    m_window.setActive();
+    State::get().gameWindow.setVerticalSyncEnabled(settings.window.vsync);
+    State::get().gameWindow.setFramerateLimit(settings.window.fpsLimit);
+    State::get().gameWindow.setMouseCursorVisible(true);
+    State::get().gameWindow.setActive();
 
     updateFrameScale();
 }
@@ -130,17 +132,19 @@ void Game::play()
 {
     sf::Clock clock;
 
-    while (m_window.isOpen()) {
+    while (State::get().gameWindow.isOpen()) {
         updateFrameMouseCoord();
         State::get().leftClick = false;
         State::get().rightClick = false;
+        State::get().updateKeyStatuses();
+        State::get().clearAllKeyPressedStatuses();
         State::get().deltaMs = clock.restart().asMilliseconds();
 
         sf::Event event;
-        while (m_window.pollEvent(event)) {
+        while (State::get().gameWindow.pollEvent(event)) {
             switch (event.type) {
                 case sf::Event::Closed:
-                    m_window.close();
+                    State::get().gameWindow.close();
                     break;
                 case sf::Event::Resized:
                     updateFrameScale();
@@ -158,15 +162,16 @@ void Game::play()
                     }
                     break;
                 case sf::Event::MouseWheelScrolled:
-                    State::get().mouseScrollDelta
+                    State::get().scrollDelta
                         = event.mouseWheelScroll.delta;
+                    break;
+                case sf::Event::KeyPressed:
+                    State::get().setKeyPressedStatus(event.key.code, true);
                     break;
                 default:
                     break;
             }
         }
-
-        State::get().updateKeyStatuses();
 
         updateState();
         renderFrame();
@@ -181,7 +186,7 @@ void Game::updateState()
     State::get().update();
 
     if (State::get().getKeyStatus(Key::Esc)) {
-        m_window.close();
+        State::get().gameWindow.close();
     }
 
     if (State::get().getKeyStatus(Key::D)) {
@@ -190,11 +195,11 @@ void Game::updateState()
 
     // TODO: Remove this
     static int count = 0;
-    if (State::get().getKeyStatus(Key::A)) {
+    if (State::get().getKeyPressedStatus(Key::A)) {
         ++count;
         State::get().windowManager->add(new FooWindow(std::to_string(count)));
     }
-    else if (State::get().getKeyStatus(Key::R) && count > 0) {
+    else if (State::get().getKeyPressedStatus(Key::R) && count > 0) {
         State::get().windowManager->remove(std::to_string(count));
         --count;
     }
@@ -204,34 +209,39 @@ void Game::updateState()
 ///////////////////////////////////////////////////////////////////////////////
 void Game::renderFrame()
 {
-    m_frame.clear();
-    m_frame.draw(State::get());
-    m_frame.display();
+    State::get().frameBuffer.clear();
+    State::get().frameBuffer.draw(State::get());
+    State::get().frameBuffer.display();
 
-    sf::Sprite frameSprite(m_frame.getTexture());
-    frameSprite.setScale(m_frameScale);
+    sf::Sprite frameSprite(State::get().frameBuffer.getTexture());
+    frameSprite.setScale(State::get().frameScale);
 
-    m_window.clear();
-    m_window.draw(frameSprite);
-    m_window.display();
+    //State::get().gameWindow.clear();
+    State::get().gameWindow.draw(frameSprite);
+    State::get().gameWindow.display();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void Game::updateFrameScale()
 {
-    m_frameScale.x = static_cast<float>(m_window.getSize().x)
-                     / static_cast<float>(m_frameSize.x);
-    m_frameScale.y = static_cast<float>(m_window.getSize().y)
-                     / static_cast<float>(m_frameSize.y);
+    State::get().frameScale.x =
+        static_cast<float>(State::get().gameWindow.getSize().x)
+        / static_cast<float>(State::get().frameSize.x);
+    State::get().frameScale.y =
+        static_cast<float>(State::get().gameWindow.getSize().y)
+        / static_cast<float>(State::get().frameSize.y);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void Game::updateFrameMouseCoord()
 {
-    sf::Vector2f windowPosition = m_window.mapPixelToCoords(
-        sf::Mouse::getPosition(m_window));
+    sf::Vector2f windowPosition = State::get().gameWindow.mapPixelToCoords(
+        sf::Mouse::getPosition(State::get().gameWindow));
+
     State::get().mousePosition = sf::Vector2i(
-        static_cast<int>(std::round(windowPosition.x / m_frameScale.x)),
-        static_cast<int>(std::round(windowPosition.y / m_frameScale.y))
+        static_cast<int>(std::round(
+            windowPosition.x / State::get().frameScale.x)),
+        static_cast<int>(std::round(
+            windowPosition.y / State::get().frameScale.y))
     );
 }

@@ -145,11 +145,12 @@ bool GlyphTileMap::containsPosition(const sf::Vector2i& position) const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-sf::Vector2i GlyphTileMap::getTileCoordFromCoord(const sf::Vector2u& coord)
+sf::Vector2i GlyphTileMap::getTileCoordFromPosition(
+    const sf::Vector2i& position) const
 {
     auto thisPosition = this->getPosition();
-    return {static_cast<int>((coord.x - thisPosition.x) / m_spacing.x),
-            static_cast<int>((coord.y - thisPosition.y) / m_spacing.y)};
+    return {static_cast<int>((position.x - thisPosition.x) / m_spacing.x),
+            static_cast<int>((position.y - thisPosition.y) / m_spacing.y)};
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -44,6 +44,9 @@ class WindowManager;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Singleton holding references to different management classes
+///
+/// TODO: Add a unique StateInterface class for the rendering, logic, etc...
+/// subsystems to hide parts of State that they don't need access to
 ///////////////////////////////////////////////////////////////////////////////
 class State : public sf::Drawable {
 public:
@@ -89,7 +92,29 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Sets the pressed status for all keys to false
     ///////////////////////////////////////////////////////////////////////////
-    void clearAllKeys();
+    void clearAllKeyStatuses();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns whether or not a key was pressed this frame
+    ///
+    /// @param key  Key value to check
+    ///
+    /// @return True if the key was pressed this frame, false otherwise
+    ///////////////////////////////////////////////////////////////////////////
+    bool getKeyPressedStatus(Key key);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Sets whether or not a key was pressed this frame
+    ///
+    /// @param sfKey    Key value to search for in the mappings and set
+    /// @param status   Whether or not the key was pressed
+    ///////////////////////////////////////////////////////////////////////////
+    void setKeyPressedStatus(sf::Keyboard::Key sfKey, bool status);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Sets the pressed (this frame) status for all keys to false
+    ///////////////////////////////////////////////////////////////////////////
+    void clearAllKeyPressedStatuses();
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates a key mapping
@@ -110,14 +135,34 @@ public:
     bool getMouseStatus(MouseButton button);
 
     ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Display
+    ///////////////////////////////////////////////////////////////////////////
+
     sf::Font font;
+    sf::Vector2u frameSize;
+    sf::Vector2f frameScale;
+    sf::RenderWindow gameWindow;
+    sf::RenderTexture frameBuffer;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Input
+    ///////////////////////////////////////////////////////////////////////////
+
     sf::Int32 deltaMs = 0;
     bool showDebug = false;
     bool leftClick = false;
     bool rightClick = false;
-    float mouseScrollDelta = 0.0f;
-    sf::Vector2i mousePosition = {0,0};
-    sf::Vector2i lastMousePosition = {0,0};
+    float scrollDelta = 0.0f;
+    sf::Vector2i mousePosition = {0, 0};
+    sf::Vector2i lastMousePosition = {0, 0};
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Managers
+    ///////////////////////////////////////////////////////////////////////////
+
+    std::unique_ptr<DebugManager> debugManager;
     std::unique_ptr<WindowManager> windowManager;
 
 private:
@@ -134,8 +179,8 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
-    std::unique_ptr<DebugManager> m_debugManager;
-    std::array <bool, static_cast<int>(Key::Count)> m_keyStatuses;
+    std::array<bool, static_cast<int>(Key::Count)> m_keyStatuses;
+    std::array<bool, static_cast<int>(Key::Count)> m_keyPressedStatuses;
     std::array<sf::Keyboard::Key, static_cast<int>(Key::Count)> m_keyMappings;
 };
 

@@ -54,8 +54,8 @@ State& State::get()
 ///////////////////////////////////////////////////////////////////////////////
 void State::update()
 {
+    debugManager->update();
     windowManager->update();
-    m_debugManager->update();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ State::State() : windowManager(new WindowManager())
     }
 
     // Create dependent managers
-    m_debugManager = std::make_unique<DebugManager>(font);
+    debugManager = std::make_unique<DebugManager>(font);
 
     // Set default keybindings
     m_keyMappings = defaultKeyMappings;
@@ -82,15 +82,37 @@ bool State::getKeyStatus(Key key)
 ///////////////////////////////////////////////////////////////////////////
 void State::updateKeyStatuses()
 {
-    for (size_t i = 0; i < static_cast<int>(Key::Count); ++i) {
+    for (size_t i = 0; i < static_cast<size_t>(Key::Count); ++i) {
         m_keyStatuses[i] = sf::Keyboard::isKeyPressed(m_keyMappings[i]);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void State::clearAllKeys()
+void State::clearAllKeyStatuses()
 {
     m_keyStatuses.fill(false);
+}
+
+///////////////////////////////////////////////////////////////////////////
+bool State::getKeyPressedStatus(Key key)
+{
+    return m_keyPressedStatuses[static_cast<size_t>(key)];
+}
+
+///////////////////////////////////////////////////////////////////////////
+void State::setKeyPressedStatus(sf::Keyboard::Key sfKey, bool status)
+{
+    auto it = std::find(m_keyMappings.begin(), m_keyMappings.end(), sfKey);
+
+    if (it != m_keyMappings.end()) {
+        m_keyPressedStatuses[static_cast<size_t>(*it)] = status;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void State::clearAllKeyPressedStatuses()
+{
+    m_keyPressedStatuses.fill(false);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -128,6 +150,6 @@ void State::draw(sf::RenderTarget& target, sf::RenderStates) const
     target.draw(*windowManager);
 
     if (showDebug) {
-        target.draw(*m_debugManager);
+        target.draw(*debugManager);
     }
 }

@@ -232,7 +232,7 @@ public:
     /// @return The Tile coordinate corresponding to the position. This value
     ///         may be out-of-bounds of the GlyphTileMap
     ///////////////////////////////////////////////////////////////////////////
-    sf::Vector2i getTileCoordFromCoord(const sf::Vector2u& coord);
+    sf::Vector2i getTileCoordFromPosition(const sf::Vector2i& position) const;
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates all the contained Tiles

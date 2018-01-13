@@ -11,7 +11,6 @@
 /// Headers
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <list>
 #include <SFML/Graphics.hpp>
 
 #include "Common.hpp"
@@ -59,11 +58,6 @@ public:
 private:
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Typedefs
-    ///////////////////////////////////////////////////////////////////////////
-    typedef std::list<std::unique_ptr<Window>> WindowList;
-
-    ///////////////////////////////////////////////////////////////////////////
     /// @brief Overloaded draw function from sf::Drawable/sf::Transformable
     ///
     /// Draws all managed Windows
@@ -71,12 +65,17 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Returns an iterator to the first WindowHandle with a matching tag
+    /// @brief Tries to find a window with a matching tag and returns an iter
+    ///
+    /// @param tag  Tag to search for
+    ///
+    /// @return An iterator pointing to the matching window, or m_windows.end()
     ///////////////////////////////////////////////////////////////////////////
-    WindowList::iterator getWindowIter(const std::string& tag);
+    std::vector<std::unique_ptr<Window>>::iterator getWindowIter(
+        const std::string& tag);
 
     ///////////////////////////////////////////////////////////////////////////
-    WindowList m_windows;
+    std::vector<std::unique_ptr<Window>> m_windows;
 };
 
 #endif

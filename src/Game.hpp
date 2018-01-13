@@ -36,7 +36,7 @@ public:
         } window;
 
         struct {
-            sf::Vector2i size;
+            sf::Vector2u size;
         } frame;
 
         Settings() = delete;
@@ -91,10 +91,6 @@ private:
     void updateFrameMouseCoord();
 
     ///////////////////////////////////////////////////////////////////////////
-    sf::Vector2u m_frameSize;
-    sf::Vector2f m_frameScale;
-    sf::RenderWindow m_window;
-    sf::RenderTexture m_frame;
 };
 
 #endif

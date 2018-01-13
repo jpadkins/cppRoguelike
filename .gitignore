@@ -10,6 +10,8 @@ bin/*
 cmake-build-debug/*
 .idea/*
 
+src/Sol.hpp
+
 *.swo
 *.swp
 .DS_Store

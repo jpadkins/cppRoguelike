@@ -31,7 +31,8 @@ void WindowManager::setHighest(const std::string& tag)
     auto it = getWindowIter(tag);
 
     if (it != m_windows.end()) {
-        m_windows.splice(m_windows.end(), m_windows, it);
+        m_windows.emplace_back(std::move(*it));
+        m_windows.erase(it);
     }
     else {
         log_warn("Window is not open: " + tag);
@@ -79,15 +80,17 @@ void WindowManager::update()
 ///////////////////////////////////////////////////////////////////////////////
 void WindowManager::draw(sf::RenderTarget& target, sf::RenderStates) const
 {
-    for (auto& frame : m_windows) { target.draw(*frame); }
+    for (auto& frame : m_windows) {
+        target.draw(*frame);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-WindowManager::WindowList::iterator WindowManager::getWindowIter(
+std::vector<std::unique_ptr<Window>>::iterator WindowManager::getWindowIter(
     const std::string& tag)
 {
-    auto tagsEqual = [tag](const auto& frame) {
-        return frame->tag == tag;
+    auto tagsEqual = [tag](const auto& window) {
+        return window->tag == tag;
     };
 
     return std::find_if(m_windows.begin(), m_windows.end(), tagsEqual);
