@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "State.hpp"
+#include "ZoneManager.hpp"
 #include "DebugManager.hpp"
 #include "WindowManager.hpp"
 
@@ -54,6 +55,7 @@ State& State::get()
 ///////////////////////////////////////////////////////////////////////////////
 void State::update()
 {
+    zoneManager->update();
     debugManager->update();
     windowManager->update();
 }
@@ -67,6 +69,7 @@ State::State() : windowManager(new WindowManager())
     }
 
     // Create dependent managers
+    zoneManager = std::make_unique<ZoneManager>();
     debugManager = std::make_unique<DebugManager>(font);
 
     // Set default keybindings
@@ -147,6 +150,7 @@ bool State::getMouseStatus(MouseButton button)
 ///////////////////////////////////////////////////////////////////////////
 void State::draw(sf::RenderTarget& target, sf::RenderStates) const
 {
+    target.draw(*zoneManager);
     target.draw(*windowManager);
 
     if (showDebug) {

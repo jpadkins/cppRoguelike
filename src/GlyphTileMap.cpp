@@ -12,8 +12,8 @@
 GlyphTileMap::Tile::Tile()
     : type(Type::Center),
       offset(0, 0),
-      foreground(sf::Color::White),
-      background(sf::Color::Black),
+      foreground(sf::Color::Red),
+      background(sf::Color::Blue),
       character('?') {}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -41,9 +41,13 @@ void WindowManager::setHighest(const std::string& tag)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void WindowManager::add(Window* frame)
+void WindowManager::addWindow(Window* window)
 {
-    m_windows.emplace_back(std::unique_ptr<Window>(frame));
+    if (!window) {
+        log_exit("Null argument");
+    }
+
+    m_windows.emplace_back(std::unique_ptr<Window>(window));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

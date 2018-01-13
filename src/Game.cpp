@@ -16,6 +16,7 @@
 
 #include "State.hpp"
 #include "Common.hpp"
+#include "ZoneManager.hpp"
 #include "GlyphTileMap.hpp"
 #include "WindowManager.hpp"
 #include "DraggableWindow.hpp"
@@ -125,6 +126,13 @@ Game::Game(Settings& settings)
     State::get().gameWindow.setActive();
 
     updateFrameScale();
+
+    // TODO: Remove this!
+
+    State::get().zoneManager->addZone(new Zone());
+    State::get().zoneManager->setCurrentZone("default");
+
+    // TODO: ^
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,7 +205,8 @@ void Game::updateState()
     static int count = 0;
     if (State::get().getKeyPressedStatus(Key::A)) {
         ++count;
-        State::get().windowManager->add(new FooWindow(std::to_string(count)));
+        State::get().windowManager->addWindow(
+            new FooWindow(std::to_string(count)));
     }
     else if (State::get().getKeyPressedStatus(Key::R) && count > 0) {
         State::get().windowManager->remove(std::to_string(count));

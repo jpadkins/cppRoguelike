@@ -1,30 +1,44 @@
 ///////////////////////////////////////////////////////////////////////////////
-/// @file   DebugManager.hpp
+/// @file   ZoneManager.hpp
 /// @author Jacob Adkins (jpadkins)
-/// @brief  Class to assist with debugging the application by rendering
-///         diagnostic information, debug gui, etc...
+/// @brief  A class managing active Zones, overall Zone layout, serialization,
+///         etc...
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef ROGUELIKE__DEBUG_MANAGER_HPP
-#define ROGUELIKE__DEBUG_MANAGER_HPP
+#ifndef ROGUELIKE__ZONE_MANAGER_HPP
+#define ROGUELIKE__ZONE_MANAGER_HPP
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Headers
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
-#include "Common.hpp"
+
+#include "Zone.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief Class to assist in debugging, manages rendered debug information
+/// @brief  A class managing active Zones, overall Zone layout, serialization,
+///         etc...
 ///////////////////////////////////////////////////////////////////////////////
-class DebugManager : public sf::Drawable {
+class ZoneManager : public sf::Drawable {
 public:
 
+    ZoneManager() = default;
+
     ///////////////////////////////////////////////////////////////////////////
-    /// @brief Constructor
+    /// @brief Adds a new Zone to be managed
+    ///
+    /// @param zone the Zone to be managed
     ///////////////////////////////////////////////////////////////////////////
-    explicit DebugManager(sf::Font& font);
+    void addZone(Zone* zone);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Sets the current Zone by name
+    ///
+    /// @param name Name of the Zone to set current
+    ///////////////////////////////////////////////////////////////////////////
+    void setCurrentZone(const std::string& name);
 
     ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates internal state, should be called once per frame
@@ -39,9 +53,9 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
     ///////////////////////////////////////////////////////////////////////////
-    sf::Text m_fpsText;
-    sf::Int32 m_acc = 0;
-    sf::Int32 m_fpsCount = 0;
+
+    std::string m_currentZone;
+    std::unordered_map<std::string, std::unique_ptr<Zone>> m_zones;
 };
 
 #endif
