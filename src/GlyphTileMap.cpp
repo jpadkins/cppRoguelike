@@ -148,9 +148,51 @@ bool GlyphTileMap::containsPosition(const sf::Vector2i& position) const
 sf::Vector2i GlyphTileMap::getTileCoordFromPosition(
     const sf::Vector2i& position) const
 {
+    auto coord = sf::Vector2i(0, 0);
     auto thisPosition = this->getPosition();
-    return {static_cast<int>((position.x - thisPosition.x) / m_spacing.x),
-            static_cast<int>((position.y - thisPosition.y) / m_spacing.y)};
+
+    if (position.x - thisPosition.x < 0) {
+        coord.x = -1 *
+            static_cast<int>((position.x - thisPosition.x) / m_spacing.x);
+    } else {
+        coord.x =
+            static_cast<int>((position.x - thisPosition.x) / m_spacing.x);
+    }
+
+    if (position.y - thisPosition.y < 0) {
+        coord.y = -1 *
+            static_cast<int>((position.y - thisPosition.y) / m_spacing.y);
+    } else {
+        coord.y =
+            static_cast<int>((position.y - thisPosition.y) / m_spacing.y);
+    }
+
+    return coord;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+sf::Vector2i GlyphTileMap::getTileCoordFromPosition(
+    const sf::Vector2i& position, const sf::Vector2f& thisPosition) const
+{
+    auto coord = sf::Vector2i(0, 0);
+
+    if (position.x - thisPosition.x < 0) {
+        coord.x = -1 *
+            static_cast<int>((position.x - thisPosition.x) / m_spacing.x);
+    } else {
+        coord.x =
+            static_cast<int>((position.x - thisPosition.x) / m_spacing.x);
+    }
+
+    if (position.y - thisPosition.y < 0) {
+        coord.y = -1 *
+            static_cast<int>((position.y - thisPosition.y) / m_spacing.y);
+    } else {
+        coord.y =
+            static_cast<int>((position.y - thisPosition.y) / m_spacing.y);
+    }
+
+    return coord;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,7 +202,7 @@ void GlyphTileMap::update()
 
     // Important: This relies on the layout of m_tiles, but should be a lot
     // faster than calling getIndex() for every animated tile in every map
-    for (sf::Uint32 x = 0; x < m_area.y; ++x) {
+    for (sf::Uint32 x = 0; x < m_area.x; ++x) {
         for (sf::Uint32 y = 0; y < m_area.y; ++y) {
             auto index = getIndex({x, y});
             if (m_tiles[index].animation) {

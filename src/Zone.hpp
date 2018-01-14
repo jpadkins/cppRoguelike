@@ -87,12 +87,12 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void draw(sf::RenderTarget& target, sf::RenderStates) const override;
 
+    GlyphTileMap m_map;
     int m_mapPadding = 0;
     int m_scrollSpeed = 3;
     sf::IntRect m_mapSection;
     int m_scrollThreshold = 5;
     sf::RenderTexture m_mapBuffer;
-    std::unique_ptr<GlyphTileMap> m_map;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -235,6 +235,18 @@ public:
     sf::Vector2i getTileCoordFromPosition(const sf::Vector2i& position) const;
 
     ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns the Tile coordinate corresponding to a pixel coordinate
+    ///
+    /// @param position     Pixel coordinate to determine Tile coordinate from
+    /// @param thisPosition Position to use instead of getPosition()
+    ///
+    /// @return The Tile coordinate corresponding to the position. This value
+    ///         may be out-of-bounds of the GlyphTileMap
+    ///////////////////////////////////////////////////////////////////////////
+    sf::Vector2i getTileCoordFromPosition(
+        const sf::Vector2i& position, const sf::Vector2f& thisPosition) const;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief Updates all the contained Tiles
     ///
     /// Should be called once per frame

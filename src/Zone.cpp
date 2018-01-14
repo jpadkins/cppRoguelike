@@ -12,48 +12,84 @@
 
 #include "State.hpp"
 
+// TODO: Actually implement this based on arguments
 ///////////////////////////////////////////////////////////////////////////////
-Zone::Zone()
+Zone::Zone() : m_map(State::get().font, {50, 50}, {28, 28}, 32)
 {
     name = "default";
 
-    auto glyphMap = new GlyphTileMap(
-        State::get().font,
-        {50, 50},
-        {32, 32},
-        32
-    );
-
-    m_map = std::unique_ptr<GlyphTileMap>(glyphMap);
-
     if (!m_mapBuffer.create(
-        m_map->getArea().x * m_map->getSpacing().y,
-        m_map->getArea().y * m_map->getSpacing().y)) {
+        m_map.getArea().x * m_map.getSpacing().y,
+        m_map.getArea().y * m_map.getSpacing().y)) {
         log_exit("Zone map buffer creation failed");
     }
 
     // TODO: Reomve
-    for (sf::Uint32 x = 0; x < m_map->getArea().x; ++x) {
-        for (sf::Uint32 y = 0; y < m_map->getArea().y; ++y) {
-            m_map->setTile({x, y}, GlyphTileMap::Tile());
-            if (x == m_map->getArea().x - 1 ||
+    for (sf::Uint32 x = 0; x < m_map.getArea().x; ++x) {
+        for (sf::Uint32 y = 0; y < m_map.getArea().y; ++y) {
+            m_map.setTile({x, y}, GlyphTileMap::Tile());
+            if (x == m_map.getArea().x - 1 ||
                 x == 0 ||
-                y == m_map->getArea().y - 1 ||
+                y == m_map.getArea().y - 1 ||
                 y == 0) {
-                m_map->setTileCharacter({x, y}, '@');
+                m_map.setTileCharacter({x, y}, '#');
+                m_map.setTileFgColor({x, y}, sf::Color(80, 80, 80));
+                m_map.setTileBgColor({x, y}, sf::Color(40, 40, 40));
+            }
+            else if (rand() % 3 == 0) {
+                m_map.setTileCharacter({x, y}, 'T');
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 40 + 30,
+                    rand() % 40 + 90,
+                    rand() % 40 + 50
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 20 + 0,
+                    rand() % 20 + 20,
+                    rand() % 20 + 5
+                ));
+            }
+            else if (rand() % 3 == 0) {
+                m_map.setTileCharacter({x, y}, ',');
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 40 + 30,
+                    rand() % 40 + 90,
+                    rand() % 40 + 50
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 20 + 0,
+                    rand() % 20 + 20,
+                    rand() % 20 + 5
+                ));
+            }
+            else {
+                m_map.setTileCharacter({x, y}, '.');
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 40 + 30,
+                    rand() % 40 + 90,
+                    rand() % 40 + 50
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 20 + 0,
+                    rand() % 20 + 20,
+                    rand() % 20 + 5
+                ));
             }
         }
     }
     // TODO: ^
 
     m_mapSection = sf::IntRect(
-        (m_map->getArea().x * m_map->getSpacing().x) / 2,
-        (m_map->getArea().y * m_map->getSpacing().y) / 2,
+        (m_map.getArea().x * m_map.getSpacing().x) / 2,
+        (m_map.getArea().y * m_map.getSpacing().y) / 2,
         static_cast<int>(State::get().frameSize.x),
         static_cast<int>(State::get().frameSize.y)
     );
     m_mapSection.left -= m_mapSection.width / 2;
     m_mapSection.top -= m_mapSection.height / 2;
+
+    m_mapBuffer.draw(m_map);
+    m_mapBuffer.display();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,36 +97,48 @@ void Zone::update()
 {
     // Mouse is near right edge
     if (State::get().mousePosition.x + m_scrollThreshold >=
-        static_cast<int>(State::get().frameSize.x) &&
-        m_mapSection.left + m_mapSection.width <
-        static_cast<int>(m_mapBuffer.getSize().x) +
-        m_scrollSpeed + m_mapPadding) {
+        static_cast<int>(State::get().frameSize.x) ||
+        State::get().getKeyStatus(Key::Right)) {
 
-        m_mapSection.left += m_scrollSpeed;
+        // And the map section has room to move
+        if (m_mapSection.left + m_mapSection.width <=
+            static_cast<int>(m_mapBuffer.getSize().x) - m_scrollSpeed +
+            m_mapPadding) {
+            m_mapSection.left += m_scrollSpeed;
+        }
     }
-    // Mouse is near left edge
-    else if (State::get().mousePosition.x <= m_scrollThreshold &&
-        m_mapSection.left >= m_scrollSpeed) {
-        m_mapSection.left -= m_scrollSpeed;
+        // Mouse is near left edge
+    else if (State::get().mousePosition.x <= m_scrollThreshold ||
+             State::get().getKeyStatus(Key::Left)) {
+
+        // And the map section has room to move
+        if (m_mapSection.left >= m_scrollSpeed - m_mapPadding) {
+            m_mapSection.left -= m_scrollSpeed;
+        }
     }
 
-    // Mouse is near top edge
+    // Mouse is near bottom edge
     if (State::get().mousePosition.y + m_scrollThreshold >=
-        static_cast<int>(State::get().frameSize.y) &&
-        m_mapSection.top + m_mapSection.height <
-        static_cast<int>(m_mapBuffer.getSize().y) +
-        m_scrollSpeed + m_mapPadding) {
+        static_cast<int>(State::get().frameSize.y) ||
+        State::get().getKeyStatus(Key::Down)) {
 
-        m_mapSection.top += m_scrollSpeed;
-    }
-    // Mouse is near top edge
-    else if (State::get().mousePosition.y <= m_scrollThreshold &&
-        m_mapSection.top >= m_scrollSpeed) {
-        m_mapSection.top -= m_scrollSpeed;
-    }
+        // And the map section has room to move
+        if (m_mapSection.top + m_mapSection.height <=
+            static_cast<int>(m_mapBuffer.getSize().y) -
+            m_scrollSpeed + m_mapPadding) {
+            m_mapSection.top += m_scrollSpeed;
 
-    m_mapBuffer.draw(*m_map);
-    m_mapBuffer.display();
+        }
+    }
+        // Mouse is near top edge
+    else if (State::get().mousePosition.y <= m_scrollThreshold ||
+             State::get().getKeyStatus(Key::Up)) {
+
+        // And the map section has room to move
+        if (m_mapSection.top >= m_scrollSpeed - m_mapPadding) {
+            m_mapSection.top -= m_scrollSpeed;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////
