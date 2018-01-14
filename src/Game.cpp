@@ -30,25 +30,29 @@ public:
 
     explicit FooWindow(const std::string& tag)
         : DraggableWindow(tag),
-          m_glyphMap(State::get().font, {25, 20}, {8, 15}, 16)
+          m_glyphMap(State::get().font, {26, 8}, {8, 18}, 16)
     {
-        auto randColor = []() {
-            return sf::Color(rand() % 255, rand() % 255, rand() % 255);
-        };
-
         sf::Vector2i spacing = sf::Vector2i(
             static_cast<int>(m_glyphMap.getSpacing().x),
             static_cast<int>(m_glyphMap.getSpacing().y));
 
-        auto background_color = randColor();
-        auto inc = 0;
+        auto background_color = sf::Color(
+            rand() % 30 + 40,
+            rand() % 30 + 40,
+            rand() % 30 + 40
+        );
+        auto foreground_color = sf::Color(
+            background_color.r + 40,
+            background_color.g + 40,
+            background_color.b + 40
+        );
 
         for (uint32_t x = 0; x < m_glyphMap.getArea().x; ++x) {
             for (uint32_t y = 0; y < m_glyphMap.getArea().y; ++y) {
                 // Top-left tile
                 if (x == 0 && y == 0) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'█', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'█', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {static_cast<int>(spacing.x * 0.70),
                          static_cast<int>(spacing.y * 0.75)}
@@ -57,7 +61,7 @@ public:
                     // Top-right tile
                 else if (x == m_glyphMap.getArea().x - 1 && y == 0) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'█', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'█', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {-1 * static_cast<int>(spacing.x * 0.70),
                          static_cast<int>(spacing.y * 0.75)}
@@ -67,7 +71,7 @@ public:
                 else if (x == m_glyphMap.getArea().x - 1 &&
                          y == m_glyphMap.getArea().y - 1) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'█', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'█', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {-1 * static_cast<int>(spacing.x * 0.70),
                          -1 * static_cast<int>(spacing.y * 0.75)}
@@ -76,7 +80,7 @@ public:
                     // Bottom-left tile
                 else if (x == 0 && y == m_glyphMap.getArea().y - 1) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'█', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'█', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {static_cast<int>(spacing.x * 0.70),
                          -1 * static_cast<int>(spacing.y * 0.75)}
@@ -85,7 +89,7 @@ public:
                     // Left column tiles
                 else if (x == 0) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'▐', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'▐', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {static_cast<int>(spacing.x * 0.70),
                          -1 * static_cast<int>(spacing.y * 0.05)}
@@ -94,7 +98,7 @@ public:
                     // Right column tiles
                 else if (x == m_glyphMap.getArea().x - 1) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'▌', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'▌', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {-1 * static_cast<int>(spacing.x * 0.70),
                          static_cast<int>(spacing.y * 0.05)}
@@ -103,7 +107,7 @@ public:
                     // Top row tiles
                 else if (y == 0) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'~', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'~', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {0, static_cast<int>(spacing.y * 0.75)}
                     ));
@@ -111,33 +115,10 @@ public:
                     // Bottom row tiles
                 else if (y == m_glyphMap.getArea().y - 1) {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
-                        L'~', GlyphTileMap::Tile::Exact, sf::Color::White,
+                        L'~', GlyphTileMap::Tile::Exact, foreground_color,
                         sf::Color::Transparent,
                         {0, -1 * static_cast<int>(spacing.y * 0.75)}
                     ));
-                }
-                    // Middle tiles
-                else if (x > 1 && y > 1 && x < m_glyphMap.getArea().x - 2
-                         && y < m_glyphMap.getArea().y - 2) {
-
-                    GlyphTileMap::Tile tile((rand() % 66) + 65,
-                                            GlyphTileMap::Tile::Center,
-                                            randColor(),
-                                            background_color);
-
-                    tile.animation = [count = inc](GlyphTileMap::Tile& tile,
-                                                   sf::Int32 deltaMs) mutable {
-
-                        count += deltaMs;
-                        if (count > 500) {
-                            tile.foreground = sf::Color(rand() % 255,
-                                                        rand() % 255,
-                                                        rand() % 255);
-                            count -= 500;
-                        }
-                    };
-                    m_glyphMap.setTile({x, y}, tile);
-                    inc += 10;
                 }
                 else {
                     m_glyphMap.setTile({x, y}, GlyphTileMap::Tile(
@@ -148,8 +129,55 @@ public:
             }
         }
 
-        setPosition(rand() % static_cast<int>(State::get().frameSize.x),
-                    rand() % static_cast<int>(State::get().frameSize.y));
+        std::string name("Foobar");
+        std::wstring hp(L"H: ❦ ❦ ❦ ❦ ❦ ❦ ❦ ❦ ❦ ❦");
+        std::wstring sp(L"S: 095% [███████████▒]");
+        std::wstring fp(L"F: 010% [▒           ]");
+        std::wstring ep(L"Lvl: 004, Exp: 000.01%");
+
+        m_glyphMap.setTileCharacter({1, 0}, ' ');
+        for (sf::Uint32 i = 0; i < name.length(); ++i) {
+            m_glyphMap.setTileCharacter({2 + i, 0},
+                                        static_cast<sf::Uint32>(name.at(i)),
+                                        GlyphTileMap::Tile::Text);
+            m_glyphMap.setTileFgColor({2 + i, 0}, sf::Color::White);
+        }
+
+        for (sf::Uint32 i = 0; i < hp.length(); ++i) {
+            m_glyphMap.setTileCharacter(
+                {2 + i, 2},
+                static_cast<sf::Uint32>(hp.at(i))
+            );
+            m_glyphMap.setTileFgColor({2 + i, 2}, sf::Color(200, 200, 200));
+        }
+        m_glyphMap.setTileFgColor({2 + 19, 2}, sf::Color(120, 120, 120));
+        m_glyphMap.setTileFgColor({2 + 21, 2}, sf::Color(120, 120, 120));
+        for (sf::Uint32 i = 0; i < sp.length(); ++i) {
+            m_glyphMap.setTileCharacter(
+                {2 + i, 3},
+                static_cast<sf::Uint32>(sp.at(i))
+            );
+            m_glyphMap.setTileFgColor({2 + i, 3}, sf::Color(200, 200, 200));
+        }
+        for (sf::Uint32 i = 0; i < fp.length(); ++i) {
+            m_glyphMap.setTileCharacter(
+                {2 + i, 4},
+                static_cast<sf::Uint32>(fp.at(i))
+            );
+            m_glyphMap.setTileFgColor({2 + i, 4}, sf::Color(200, 200, 200));
+        }
+        for (sf::Uint32 i = 0; i < ep.length(); ++i) {
+            m_glyphMap.setTileCharacter(
+                {2 + i, 5},
+                static_cast<sf::Uint32>(ep.at(i)),
+                GlyphTileMap::Tile::Text
+            );
+            m_glyphMap.setTileFgColor({2 + i, 5}, sf::Color(200, 200, 200));
+        }
+
+        setPosition(rand() % static_cast<int>(State::get().frameSize.x * 0.75),
+                    rand() % static_cast<int>(State::get().frameSize.y
+                                              * 0.75));
     }
 
     void update() override
@@ -298,8 +326,10 @@ void Game::updateState()
         State::get().gameWindow.close();
     }
 
-    if (State::get().getKeyStatus(Key::D)) {
-        State::get().showDebug = true;
+    static bool showDebug = true;
+    if (State::get().getKeyPressedStatus(Key::D)) {
+        State::get().showDebug = showDebug;
+        showDebug = !showDebug;
     }
 
     // TODO: Remove this

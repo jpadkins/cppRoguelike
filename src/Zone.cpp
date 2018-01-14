@@ -12,6 +12,13 @@
 
 #include "State.hpp"
 
+// TODO: Implement a way for Zones to be very, very large without running out
+// of space for the m_mapBuffer texture. This could be done by finding how many
+// 512x512 RenderTextures would be needed to completely cover the large map,
+// then dividing the map up amongst them. When the Zone goes to draw, it will
+// calculate texture rects for each of the RenderTextures based on the
+// mapSection, and render them together seamlessly
+
 // TODO: Actually implement this based on arguments
 ///////////////////////////////////////////////////////////////////////////////
 Zone::Zone() : m_map(State::get().font, {50, 50}, {28, 28}, 32)
@@ -37,42 +44,29 @@ Zone::Zone() : m_map(State::get().font, {50, 50}, {28, 28}, 32)
                 m_map.setTileBgColor({x, y}, sf::Color(40, 40, 40));
             }
             else if (rand() % 3 == 0) {
-                m_map.setTileCharacter({x, y}, 'T');
+                m_map.setTileCharacter({x, y}, ' ');
                 m_map.setTileFgColor({x, y}, sf::Color(
                     rand() % 40 + 30,
                     rand() % 40 + 90,
                     rand() % 40 + 50
                 ));
                 m_map.setTileBgColor({x, y}, sf::Color(
-                    rand() % 20 + 0,
-                    rand() % 20 + 20,
-                    rand() % 20 + 5
-                ));
-            }
-            else if (rand() % 3 == 0) {
-                m_map.setTileCharacter({x, y}, ',');
-                m_map.setTileFgColor({x, y}, sf::Color(
-                    rand() % 40 + 30,
-                    rand() % 40 + 90,
-                    rand() % 40 + 50
-                ));
-                m_map.setTileBgColor({x, y}, sf::Color(
-                    rand() % 20 + 0,
-                    rand() % 20 + 20,
-                    rand() % 20 + 5
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
                 ));
             }
             else {
-                m_map.setTileCharacter({x, y}, '.');
+                m_map.setTileCharacter({x, y}, ' ');
                 m_map.setTileFgColor({x, y}, sf::Color(
                     rand() % 40 + 30,
                     rand() % 40 + 90,
                     rand() % 40 + 50
                 ));
                 m_map.setTileBgColor({x, y}, sf::Color(
-                    rand() % 20 + 0,
-                    rand() % 20 + 20,
-                    rand() % 20 + 5
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
                 ));
             }
         }

@@ -10,6 +10,15 @@
 
 #include "Window.hpp"
 
+// TODO: Add a virtual function in the style of withinDraggableRegion() but for
+// when deciding if the window should consume mouse. For example, if a window
+// has an outside border of tiles with a transparent background which are
+// manually moved towards the center of the map to create a border, the
+// player should be able to click through that transparent, unused outside
+// border of tiles
+
+// TODO: Don't drag the window when the new location would be outside the frame
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief  Parent class for UI elements that can be dragged with the mouse
 ///////////////////////////////////////////////////////////////////////////////
