@@ -15,11 +15,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 void DrawAndTransform::matchLastMouseMovement()
 {
-    State& state = State::get();
     auto position = getPosition();
 
     setPosition(
-        position.x + (state.mousePosition.x - state.lastMousePosition.x),
-        position.y + (state.mousePosition.y - state.lastMousePosition.y)
+        position.x + (State::get().mousePosition.x -
+            State::get().lastMousePosition.x),
+        position.y + (State::get().mousePosition.y -
+            State::get().lastMousePosition.y)
     );
 }

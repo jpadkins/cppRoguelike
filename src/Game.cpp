@@ -202,10 +202,12 @@ public:
         auto area = m_glyphMap.getArea();
         auto spacing = m_glyphMap.getSpacing();
 
-        return (position.x > thisPosition.x &&
-                position.x < thisPosition.x + (area.x * spacing.x) &&
-                position.y > thisPosition.y &&
-                position.y < thisPosition.y + (area.y * spacing.y));
+        return (position.x > thisPosition.x + spacing.x &&
+                position.x < thisPosition.x + (area.x * spacing.x)
+                             - spacing.x &&
+                position.y > thisPosition.y + spacing.y &&
+                position.y < thisPosition.y + (area.y * spacing.y)
+                             - spacing.y);
     }
 
 private:
@@ -226,6 +228,26 @@ private:
                 coord.x < static_cast<int>(m_glyphMap.getArea().x - 1)) ||
                (coord.y > static_cast<int>(m_glyphMap.getArea().y - 3) &&
                 coord.y < static_cast<int>(m_glyphMap.getArea().y - 1));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool canBeDragged() override
+    {
+        auto position = getPosition();
+        auto width = m_glyphMap.getArea().x * m_glyphMap.getSpacing().x;
+        auto height = m_glyphMap.getArea().y * m_glyphMap.getSpacing().y;
+
+        auto newPosition = sf::Vector2f(
+            position.x + (State::get().mousePosition.x -
+                          State::get().lastMousePosition.x),
+            position.y + (State::get().mousePosition.y -
+                          State::get().lastMousePosition.y)
+        );
+
+        return newPosition.x >= 0 &&
+               newPosition.x + width <= State::get().frameSize.x &&
+               newPosition.y >= 0 &&
+               newPosition.y + height <= State::get().frameSize.y;
     }
 
     GlyphTileMap m_glyphMap;

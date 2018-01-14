@@ -32,8 +32,14 @@ void DraggableWindow::updateDrag()
                     m_dragging = true;
                 }
             }
-            else if (m_dragging) {
+            else if (m_dragging && canBeDragged()) {
                 matchLastMouseMovement();
+            }
+            else if (m_dragging) {
+                if (!containsMouse()) {
+                    Window::focus.clear();
+                    m_dragging = false;
+                }
             }
         }
         else if (m_dragging || !Window::focus.empty()) {
@@ -45,6 +51,12 @@ void DraggableWindow::updateDrag()
 
 ///////////////////////////////////////////////////////////////////////////////
 bool DraggableWindow::withinDraggableRegion(const sf::Vector2i&)
+{
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////
+bool DraggableWindow::canBeDragged()
 {
     return true;
 }
