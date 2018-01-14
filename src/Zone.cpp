@@ -39,16 +39,60 @@ Zone::Zone() : m_map(State::get().font, {50, 50}, {28, 28}, 32)
                 x == 0 ||
                 y == m_map.getArea().y - 1 ||
                 y == 0) {
-                m_map.setTileCharacter({x, y}, '#');
-                m_map.setTileFgColor({x, y}, sf::Color(80, 80, 80));
-                m_map.setTileBgColor({x, y}, sf::Color(40, 40, 40));
+                if (rand() % 2 == 0) {
+                    m_map.setTileCharacter({x, y}, '#');
+                }
+                else {
+                    m_map.setTileCharacter({x, y}, '=');
+                }
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 20 + 50,
+                    rand() % 10 + 50,
+                    rand() % 5 + 50
+                ));
+            }
+            else if (rand() % 5 == 0) {
+                if (rand() % 2 == 0) {
+                    m_map.setTileCharacter({x, y}, '#');
+                }
+                else {
+                    m_map.setTileCharacter({x, y}, '=');
+                }
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 20 + 50,
+                    rand() % 10 + 50,
+                    rand() % 5 + 50
+                ));
             }
             else if (rand() % 3 == 0) {
-                m_map.setTileCharacter({x, y}, ' ');
+                m_map.setTileCharacter({x, y}, ',');
                 m_map.setTileFgColor({x, y}, sf::Color(
-                    rand() % 40 + 30,
-                    rand() % 40 + 90,
-                    rand() % 40 + 50
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
+                ));
+                m_map.setTileBgColor({x, y}, sf::Color(
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
+                ));
+            }
+            else if (rand() % 3 == 0) {
+                m_map.setTileCharacter({x, y}, '.');
+                m_map.setTileFgColor({x, y}, sf::Color(
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
                 ));
                 m_map.setTileBgColor({x, y}, sf::Color(
                     rand() % 5 + 30,
@@ -59,9 +103,9 @@ Zone::Zone() : m_map(State::get().font, {50, 50}, {28, 28}, 32)
             else {
                 m_map.setTileCharacter({x, y}, ' ');
                 m_map.setTileFgColor({x, y}, sf::Color(
-                    rand() % 40 + 30,
-                    rand() % 40 + 90,
-                    rand() % 40 + 50
+                    rand() % 5 + 30,
+                    rand() % 5 + 10,
+                    rand() % 5 + 5
                 ));
                 m_map.setTileBgColor({x, y}, sf::Color(
                     rand() % 5 + 30,
